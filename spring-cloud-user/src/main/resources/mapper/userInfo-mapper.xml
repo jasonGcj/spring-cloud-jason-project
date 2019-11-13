@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jason.user.mapper.UserMapper">
+
+        <insert id="registerUser" parameterType="com.jason.user.domain.UserInfoDto">
+         INSERT INTO t_bas_user (id,username,password,phone_number,create_time,modify_time,active)
+         VALUES (#{id},#{userName},#{passWord},#{phoneNumber},#{createTime},#{modifyTime},#{active})
+        </insert>
+
+        <select id="checkUserName" resultType="string">
+            SELECT username as userName FROM t_bas_user WHERE username = #{userName} and active = 'Y' LIMIT 1
+        </select>
+
+        <select id="checkUserPwd" resultType="com.jason.user.domain.UserInfoDto"
+                parameterType="com.jason.user.domain.UserInfoDto">
+             SELECT
+             username as userName,
+             password as passWord
+             FROM t_bas_user
+             WHERE
+             username = #{userName}
+             and password = #{passWord}
+             and active = 'Y' LIMIT 1
+        </select>
+
+
+</mapper>

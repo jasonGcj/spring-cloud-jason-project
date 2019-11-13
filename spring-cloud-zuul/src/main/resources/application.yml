@@ -1,0 +1,42 @@
+server:
+  port: 9999
+spring:
+  application:
+    name: api-geteway
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 0
+    # Redis服务器地址
+    host: 192.168.88.130
+    # Redis服务器连接端口
+    port: 6379
+    pool:
+      # 连接池最大连接数（使用负值表示没有限制）
+      max-active: 8
+      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-wait: -1
+      # 连接池中的最大空闲连接
+      max-idle: 8
+      # 连接池中的最小空闲连接
+      min-idle: 0
+      # 连接超时时间（毫秒）
+      timeout: 5000
+zuul:
+  routes:
+    #标识你服务的名字，这里可以自己定义，一般方便和规范来讲还是跟自己服务的名字一样
+    cloud-user:
+      #服务映射的路径，通过这路径就可以从外部访问你的服务了，目的是为了不爆露你机器的IP，面向服务的路由了，给你选一个可用的出来，
+      #这里zuul是自动依赖hystrix，ribbon的，不是面向单机
+      path: /user/**
+      #这里一定要是你Eureka注册中心的服务的名称，是所以这里配置serviceId因为跟eureka结合了，如果单独使用zuul,那么就必须写自己机器的IP了，
+      #如url:http://localhost:8080/  这样的不好就是写死IP了，万一这IP挂了，这高可用性，服务注册那套东西就用不起来了
+      serviceId: cloud-user
+    baidu:
+      url: https://www.baidu.com
+
+eureka:
+  #客户端
+  client:
+    #注册中心地址
+    service-url:
+      defaultZone: http://localhost:1000/eureka/
