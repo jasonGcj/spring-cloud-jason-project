@@ -10,4 +10,6 @@ public class JasonConst {
     public static final String STR_Y = "Y";
 
     public static final String STR_N = "N";
+
+    public static final String NUM_ONE = "1";
 }

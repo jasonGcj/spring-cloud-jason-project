@@ -7,7 +7,6 @@ import com.jason.user.mapper.UserMapper;
 import com.jason.user.service.UserService;
 import com.jason.utils.JwtUtil;
 import com.jason.utils.Md5Util;
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
