@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @ClassName InterceptorConfig
  * @Description TODO
@@ -19,8 +22,12 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
+        List<String> list = new ArrayList<>();
+        list.add("/**/register/**");
+        list.add("/**/login/**");
+        list.add("/**/hello/**");
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**") //拦截的地址
-                .excludePathPatterns("/**/login/**");//过滤的
+                .excludePathPatterns(list);
     }
 }
