@@ -139,25 +139,25 @@ public class UserServiceImpl implements UserService {
         }
         userInfo.setPassWord(Md5Util.md5password(passWord));
         UserInfoDto userResult = userMapper.checkUserPwd(userInfo);
-        if(null != userResult && StringUtils.isNotBlank(userResult.getPassWord())){
-            Map<String, Object> map = new HashMap<>();
-            map.put("userName",userResult.getUserName());
-            map.put("passWord",userResult.getPassWord());
-            //生成Token
-            String token = JwtUtil.createToken(map);
-            LOGGER.info("token:"+token);
-            //1.大key  2.小key 3.Token 编码
-            //redisTemplate.opsForHash().put("token",userResult.getUserName(),token);
-            result.setMessage("验证成功");
-            result.setCode(200);
-            result.setOk(true);
-            return result;
-        }else{
+        if(null != userResult){
+            if(StringUtils.isNotBlank(userResult.getPassWord())){
+                Map<String, Object> map = new HashMap<>();
+                map.put("userName",userResult.getUserName());
+                map.put("passWord",userResult.getPassWord());
+                //生成Token
+                String token = JwtUtil.createToken(map);
+                LOGGER.info("token:"+token);
+                //1.大key  2.小key 3.Token 编码
+                //redisTemplate.opsForHash().put("token",userResult.getUserName(),token);
+                result.setMessage("验证成功");
+                result.setCode(200);
+                result.setOk(true);
+                return result;
+            }
+        }
             result.setMessage("验证失败,密码错误");
             result.setOk(false);
             return result;
-        }
-
     }
 
     /**
