@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
         }
         userInfo.setPassWord(Md5Util.md5password(passWord));
         UserInfoDto userResult = userMapper.checkUserPwd(userInfo);
-        if(StringUtils.isNotBlank(userResult.getPassWord())){
+        if(null != userResult && StringUtils.isNotBlank(userResult.getPassWord())){
             Map<String, Object> map = new HashMap<>();
             map.put("userName",userResult.getUserName());
             map.put("passWord",userResult.getPassWord());
