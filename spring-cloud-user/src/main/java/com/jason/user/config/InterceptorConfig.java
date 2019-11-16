@@ -25,9 +25,8 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
         List<String> list = new ArrayList<>();
         list.add("/**/register/**");
         list.add("/**/login/**");
-        list.add("/**/hello/**");
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**") //拦截的地址
-                .excludePathPatterns(list);
+                .excludePathPatterns(list);//放行的地址
     }
 }
