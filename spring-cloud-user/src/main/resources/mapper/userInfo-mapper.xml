@@ -24,5 +24,9 @@
              and active = 'Y' LIMIT 1
         </select>
 
+        <select id="checkUserPhone" resultType="int">
+            SELECT count(*) FROM t_bas_user WHERE phone_number = #{phone} AND active = 'Y'
+        </select>
+
 
 </mapper>

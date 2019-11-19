@@ -1,7 +1,10 @@
 package com.jason.user.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.jason.consts.JasonConst;
 import com.jason.domain.ResultVo;
+import com.jason.message.ZxHttpUtil;
 import com.jason.user.domain.UserInfoDto;
 import com.jason.user.mapper.UserMapper;
 import com.jason.user.service.UserService;
@@ -50,12 +53,21 @@ public class UserServiceImpl implements UserService {
             result.setMessage("用户名或密码为空");
             return result;
         }
+
         /**
          * 验证用户名密码长度  后期优化
          */
         if(!checkUserAndPwdLength(userInfoDto)){
             result.setMessage("用户名或密码长度不够");
             return result;
+        }
+
+        if(StringUtils.isNotBlank(userInfoDto.getPhoneNumber())){
+            int count = userMapper.checkUserPhone(userInfoDto.getPhoneNumber());
+            if(count>0){
+                result.setMessage("不好意思,您输入的手机号已存在");
+                return result;
+            }
         }
 
         try {
@@ -150,6 +162,7 @@ public class UserServiceImpl implements UserService {
                 //1.大key  2.小key 3.Token 编码
                 //redisTemplate.opsForHash().put("token",userResult.getUserName(),token);
                 result.setMessage("验证成功");
+                result.setData(token);
                 result.setCode(200);
                 result.setOk(true);
                 return result;
@@ -160,6 +173,76 @@ public class UserServiceImpl implements UserService {
             return result;
     }
 
+    @Override
+    public ResultVo phoneLoginUser(Map<String, Object> map) {
+        ResultVo result = new ResultVo();
+        String phone = (String) map.get("phoneNumber");
+        String code = (String) map.get("code");
+        if(StringUtils.isBlank(phone)){
+            LOGGER.info("用户输入的手机号为空或空格");
+            result.setMessage("用户输入的手机号为空或空格");
+        }
+        if(StringUtils.isBlank(code)){
+            LOGGER.info("用户输入的验证码为空或空格");
+            result.setMessage("用户输入的验证码为空或空格");
+        }
+        try {
+            String phoneCode = (String) redisTemplate.opsForHash().get("phone", phone);
+            if(code.equals(phoneCode)){
+                result.setCode(200);
+                result.setOk(true);
+                result.setMessage("验证成功");
+            }else{
+                result.setCode(201);
+                result.setOk(false);
+                result.setMessage("验证失败");
+            }
+        } catch (Exception e) {
+            LOGGER.info("获取Redis的信息失败:"+e.getMessage());
+            e.printStackTrace();
+            result.setCode(500);
+            result.setMessage("用户登录失败");
+            result.setOk(false);
+            return result;
+        }
+        return result;
+    }
+
+    @Override
+    public ResultVo sendCode(Map<String, String> map) {
+        ResultVo result = new ResultVo();
+        String phone = (String) map.get("phoneNumber");
+        if(StringUtils.isBlank(phone)){
+            result.setMessage("用户输入的手机号为空或空格");
+        }
+        int count = userMapper.checkUserPhone(phone);
+        if(count<=0){
+            result.setMessage("不好意思!您输入的手机号不存在");
+            return result;
+        }
+        int code = (int) ((Math.random() * 9 + 1) * 100000);
+        try {
+            String rep = ZxHttpUtil.sendPostMessage(phone,code);
+            redisTemplate.opsForHash().put("phone", phone,code+"");
+            JSONObject jsonObject = JSONObject.parseObject(rep);
+            if(jsonObject != null){
+                String str = (String) jsonObject.get("result_msg");
+                if("提交成功".equals(str)){
+                    result.setOk(true);
+                    result.setMessage("验证码发送成功");
+                }else{
+                    result.setMessage("验证码发送失败");
+                }
+            }else {
+                result.setMessage("验证码发送失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMessage("验证码发送失败,系统异常");
+        }
+        return result;
+    }
+
     /**
      * 验证字符串密码长度
      * @param userInfoDto
@@ -168,7 +251,7 @@ public class UserServiceImpl implements UserService {
     public boolean checkUserAndPwdLength(UserInfoDto userInfoDto){
         int pwdlength = userInfoDto.getPassWord().length();
         int userlength = userInfoDto.getUserName().length();
-        if(pwdlength > 6 && pwdlength <16 && userlength>8 && userlength<16){
+        if(pwdlength >= 8 && pwdlength <=16 && userlength>=6 && userlength<=16){
             return true;
         }
         return false;

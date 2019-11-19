@@ -4,6 +4,7 @@ import com.jason.domain.ResultVo;
 import com.jason.user.domain.UserInfoDto;
 import com.jason.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import java.util.Map;
  * @Date 2019/11/11 9:30
  */
 @RestController
+@CrossOrigin
 @RequestMapping("/user")
 public class UserController {
 
@@ -61,4 +63,25 @@ public class UserController {
     public ResultVo checkUserName(@RequestBody Map<String,String> map){
         return userService.checkUserName(map);
     }
+
+    /**
+     * 手机号登录
+     * @param map
+     * @return
+     */
+    @RequestMapping("/phoneLogin")
+    public ResultVo phoneLoginUser(@RequestBody Map<String,Object> map){
+        return userService.phoneLoginUser(map);
+    }
+
+    /**
+     * 发送验证码
+     * @param map
+     * @return
+     */
+    @RequestMapping("/sendCode")
+    public ResultVo sendCode(@RequestBody Map<String,String> map){
+        return userService.sendCode(map);
+    }
+
 }

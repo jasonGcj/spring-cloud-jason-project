@@ -13,6 +13,7 @@
         <module>spring-cloud-common</module>
         <module>spring-cloud-user</module>
         <module>spring-cloud-zuul</module>
+        <module>spring-cloud-machine</module>
     </modules>
 
     <!--springBoot 父类依赖-->

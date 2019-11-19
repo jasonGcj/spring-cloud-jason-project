@@ -17,4 +17,6 @@ public interface UserMapper {
     String checkUserName(@Param("userName") String userName);
 
     UserInfoDto checkUserPwd(UserInfoDto userInfo);
+
+    int checkUserPhone(@Param("phone")String phone);
 }

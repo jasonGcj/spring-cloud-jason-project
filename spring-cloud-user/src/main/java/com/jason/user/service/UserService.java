@@ -31,4 +31,8 @@ public interface UserService {
      * @return
      */
     ResultVo loginUser(UserInfoDto userInfo);
+
+    ResultVo phoneLoginUser(Map<String, Object> map);
+
+    ResultVo sendCode(Map<String, String> map);
 }
