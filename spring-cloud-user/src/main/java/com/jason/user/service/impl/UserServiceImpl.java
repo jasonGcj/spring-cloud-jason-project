@@ -244,6 +244,52 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * 修改用户密码
+     * @param map
+     * @return
+     */
+    @Override
+    public ResultVo updatePwd(Map<String, String> map) {
+        ResultVo result = new ResultVo();
+        String userName = map.get("userName");//用户名
+        String oldPwd = map.get("oldPwd");//老密码
+        String newPwd = map.get("newPwd");//新密码
+        String reNewPwd = map.get("reNewPwd");//确认密码
+        if(StringUtils.isBlank(userName) && StringUtils.isBlank(oldPwd) &&
+                StringUtils.isBlank(newPwd) && StringUtils.isBlank(reNewPwd)){
+            LOGGER.info("用户名或密码为null");
+            result.setMessage("用户名或密码为null");
+        }
+
+        if(!newPwd.equals(reNewPwd)){
+            LOGGER.info("新密码和旧密码不一样...");
+            result.setMessage("新密码和旧密码不一样...");
+        }
+
+        UserInfoDto userInfoDto = new UserInfoDto();
+        userInfoDto.setPassWord(Md5Util.md5password(oldPwd));
+        userInfoDto.setUserName(userName);
+        try {
+            UserInfoDto userResult = userMapper.checkUserPwd(userInfoDto);
+            if(null != userResult){
+               if(StringUtils.isNotBlank(userResult.getPassWord())){
+                   userInfoDto.setPassWord(Md5Util.md5password(newPwd));
+                   userInfoDto.setId(userResult.getId());
+                   userMapper.updatePwd(userInfoDto);
+               }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.error("密码修改失败:"+e.getMessage());
+            result.setMessage("密码修改失败");
+        }
+        result.setMessage("用户:"+userName+"密码修改成功");
+        result.setCode(200);
+        result.setOk(true);
+        return result;
+    }
+
+    /**
      * 验证字符串密码长度
      * @param userInfoDto
      * @return

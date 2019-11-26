@@ -19,4 +19,6 @@ public interface UserMapper {
     UserInfoDto checkUserPwd(UserInfoDto userInfo);
 
     int checkUserPhone(@Param("phone")String phone);
+
+    void updatePwd(UserInfoDto userInfoDto);
 }

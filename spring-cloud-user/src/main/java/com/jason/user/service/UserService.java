@@ -35,4 +35,6 @@ public interface UserService {
     ResultVo phoneLoginUser(Map<String, Object> map);
 
     ResultVo sendCode(Map<String, String> map);
+
+    ResultVo updatePwd(Map<String, String> map);
 }

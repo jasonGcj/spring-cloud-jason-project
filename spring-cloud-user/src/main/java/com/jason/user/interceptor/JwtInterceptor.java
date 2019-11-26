@@ -28,7 +28,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         String s = JwtUtil.checkToken(header);
         if(StringUtils.isBlank(s)){
             LOGGER.info("用户为登录不能访问");
-            return false;
+            throw  new RuntimeException("你还没有登录");
         }
         System.out.println("放行");
         return true;

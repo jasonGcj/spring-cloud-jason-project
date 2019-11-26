@@ -84,4 +84,14 @@ public class UserController {
         return userService.sendCode(map);
     }
 
+    /**
+     * 修改密码
+     * @param map
+     * @return
+     */
+    @RequestMapping("/updatePwd")
+    public ResultVo updatePwd(@RequestBody Map<String,String> map){
+        return userService.updatePwd(map);
+    }
+
 }

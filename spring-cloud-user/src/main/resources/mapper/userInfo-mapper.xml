@@ -15,6 +15,7 @@
         <select id="checkUserPwd" resultType="com.jason.user.domain.UserInfoDto"
                 parameterType="com.jason.user.domain.UserInfoDto">
              SELECT
+             id as id,
              username as userName,
              password as passWord
              FROM t_bas_user
@@ -26,6 +27,10 @@
 
         <select id="checkUserPhone" resultType="int">
             SELECT count(*) FROM t_bas_user WHERE phone_number = #{phone} AND active = 'Y'
+        </select>
+
+        <select id="updatePwd" parameterType="com.jason.user.domain.UserInfoDto">
+            update t_bas_user set password = #{passWord} where id = #{id}
         </select>
 
 
