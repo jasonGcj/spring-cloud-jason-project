@@ -4,6 +4,8 @@ import com.jason.utils.JwtUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.support.RequestContext;
@@ -22,15 +24,17 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtInterceptor.class);
 
+    @Autowired
+    RedisTemplate redisTemplate;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String header = request.getHeader("token");
         String s = JwtUtil.checkToken(header);
-        if(StringUtils.isBlank(s)){
-            LOGGER.info("用户为登录不能访问");
-            throw  new RuntimeException("你还没有登录");
+        if(!StringUtils.isBlank(s)){
+            return true;
         }
-        System.out.println("放行");
-        return true;
+        request.setAttribute("失败","失败");
+        return false;
     }
 }

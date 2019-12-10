@@ -27,12 +27,7 @@ public class UserController {
 
     @RequestMapping("/hello")
     public String hello(){
-        return "I,m you father";
-    }
-
-    @RequestMapping("/hello1")
-    public String hello1(){
-        return "I,m you father1";
+        return "Weelcome to jason Home";
     }
 
     /**

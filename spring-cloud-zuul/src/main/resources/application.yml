@@ -21,6 +21,8 @@ spring:
       min-idle: 0
       # 连接超时时间（毫秒）
       timeout: 5000
+    banner:
+      location: com\jason\server\banner.txt
 zuul:
   routes:
     #标识你服务的名字，这里可以自己定义，一般方便和规范来讲还是跟自己服务的名字一样

@@ -10,6 +10,8 @@ public class ResultVo {
 
     private String message;
 
+    private int total;
+
     private int code;
 
     private Object data;
@@ -46,5 +48,13 @@ public class ResultVo {
 
     public void setOk(boolean ok) {
         this.ok = ok;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 }

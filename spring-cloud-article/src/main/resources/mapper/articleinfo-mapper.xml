@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jason.article.mapper.ArticleMapper">
+
+    <select id="queryArticle" resultType="com.jason.article.domain.ArticleVo">
+      SELECT
+        t.id as id,
+        t.title as title,
+        t.summary as summary,
+        t.is_top as isTop,
+        t.traffic as traffic,
+        t.create_time as createTime,
+        t.modify_time as modifyTime,
+        c.content as content
+        FROM
+            t_bas_article_info t
+        LEFT JOIN t_bas_article_content c ON t.id = c.article_id
+        ORDER BY t.create_time desc LIMIT 10
+    </select>
+
+    <select id="queryArticleById" resultType="com.jason.article.domain.ArticleVo">
+        SELECT
+        t.id as id,
+        t.title as title,
+        t.summary as summary,
+        t.is_top as isTop,
+        t.traffic as traffic,
+        t.create_time as createTime,
+        t.modify_time as modifyTime,
+        c.content as content
+        FROM
+            t_bas_article_info t
+        LEFT JOIN t_bas_article_content c ON t.id = c.article_id
+        AND t.id = #{id} LIMIT 1
+    </select>
+
+    <insert id="addSomeOneArticle">
+        INSERT INTO t_bas_article_info (id,title,summary,is_top,traffic)
+    </insert>
+
+</mapper>
