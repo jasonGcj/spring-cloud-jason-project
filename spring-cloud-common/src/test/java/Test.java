@@ -11,9 +11,9 @@ import java.util.HashMap;
  */
 public class Test {
     public static void main(String[] args) {
-        String Account = "15210594365";
+        String Account = "";
 // 您的短信账号密码
-        String Password = "Ljt521125";
+        String Password = "";
 // 是否需要状态报告
         String NeedStatus = "true";
         String message = "用户您好，您正在注册移花接木账号,请勿将验证码告诉他人,您的验证码是:"+"5201314"+"。";//短信内容
