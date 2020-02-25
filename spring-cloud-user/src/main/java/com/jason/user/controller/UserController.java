@@ -89,4 +89,14 @@ public class UserController {
         return userService.updatePwd(map);
     }
 
+    /**
+     * 修改密码
+     * @param
+     * @return
+     */
+    @RequestMapping("/error")
+    public String errorLogin(){
+        return "logout";
+    }
+
 }

@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName UserServiceImpl
@@ -160,7 +161,8 @@ public class UserServiceImpl implements UserService {
                 String token = JwtUtil.createToken(map);
                 LOGGER.info("token:"+token);
                 //1.大key  2.小key 3.Token 编码
-                //redisTemplate.opsForHash().put("token",userResult.getUserName(),token);
+               /* redisTemplate.opsForHash().put("token",userResult.getUserName(),token);
+                redisTemplate.expire("token",1, TimeUnit.MINUTES);*/
                 result.setMessage("验证成功");
                 result.setData(token);
                 result.setCode(200);
