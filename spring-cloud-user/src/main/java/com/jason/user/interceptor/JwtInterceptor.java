@@ -38,21 +38,43 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String header = request.getHeader("token");
-        String s = JwtUtil.checkToken(header);
-        if(StringUtils.isBlank(s)){
-           /* String[] split = s.split(",");
-            String token = null;
-            try {
-                token = redisTemplate.opsForHash().get("token", split[0]).toString();
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-            if(header.equals(token)){
-                LOGGER.info("true");
-            }*/
+        boolean result = this.checkUserIsLogin(header);
+        if(!result){
             response.sendRedirect("http://localhost:1001/spring-cloud-user/user/error");
         }
+        return true;
+    }
+
+    /**
+     * 验证用户登录信息
+     * @param header
+     * @return
+     */
+    private boolean checkUserIsLogin(String header){
+
+        if(StringUtils.isBlank(header)){
+            LOGGER.error("请求头header is null");
+            return false;
+        }
+
+        String s = JwtUtil.checkToken(header);
+        if(StringUtils.isBlank(s)){
+            LOGGER.error("token is null");
+            return false;
+        }
+
+        String[] split = s.split(",");
+        String token = null;
+        try {
+            token = redisTemplate.opsForHash().get("token", split[0]).toString();
+        } catch (Exception e) {
+            return false;
+        }
+
+        if(!header.equals(token)){
+            return false;
+        }
+
         return true;
     }
 }

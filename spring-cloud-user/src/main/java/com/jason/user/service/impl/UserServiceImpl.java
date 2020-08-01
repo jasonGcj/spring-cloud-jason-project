@@ -161,8 +161,8 @@ public class UserServiceImpl implements UserService {
                 String token = JwtUtil.createToken(map);
                 LOGGER.info("token:"+token);
                 //1.大key  2.小key 3.Token 编码
-               /* redisTemplate.opsForHash().put("token",userResult.getUserName(),token);
-                redisTemplate.expire("token",1, TimeUnit.MINUTES);*/
+                redisTemplate.opsForHash().put("token",userResult.getUserName(),token);
+                redisTemplate.expire("token",1, TimeUnit.DAYS);
                 result.setMessage("验证成功");
                 result.setData(token);
                 result.setCode(200);
