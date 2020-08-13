@@ -38,7 +38,8 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String header = request.getHeader("token");
-        boolean result = this.checkUserIsLogin(header);
+        String username = request.getHeader("username");
+        boolean result = this.checkUserIsLogin(header,username);
         if(!result){
             response.sendRedirect("http://localhost:1001/spring-cloud-user/user/error");
         }
@@ -50,23 +51,16 @@ public class JwtInterceptor implements HandlerInterceptor {
      * @param header
      * @return
      */
-    private boolean checkUserIsLogin(String header){
+    private boolean checkUserIsLogin(String header,String username){
 
-        if(StringUtils.isBlank(header)){
+        if(StringUtils.isBlank(header) || StringUtils.isBlank(username)){
             LOGGER.error("请求头header is null");
             return false;
         }
 
-        String s = JwtUtil.checkToken(header);
-        if(StringUtils.isBlank(s)){
-            LOGGER.error("token is null");
-            return false;
-        }
-
-        String[] split = s.split(",");
         String token = null;
         try {
-            token = redisTemplate.opsForHash().get("token", split[0]).toString();
+             token = redisTemplate.opsForValue().get(username).toString();
         } catch (Exception e) {
             return false;
         }

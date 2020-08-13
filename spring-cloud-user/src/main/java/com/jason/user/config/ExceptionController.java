@@ -21,7 +21,7 @@ public class ExceptionController {
             ResultVo result = new ResultVo();
             result.setOk(false);
             result.setCode(500);
-            result.setMessage(e.getMessage());
+            result.setMessage("服务端异常，请稍后再试");
             return result;
     }
 
