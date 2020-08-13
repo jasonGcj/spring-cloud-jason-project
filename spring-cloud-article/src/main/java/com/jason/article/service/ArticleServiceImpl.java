@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName ArticleServiceImpl
@@ -44,5 +45,15 @@ public class ArticleServiceImpl implements ArticleService {
         ResultVo result = new ResultVo();
         articleMapper.addSomeOneArticle(dto);
         return null;
+    }
+
+    @Override
+    public ResultVo queryIndexImage() {
+        ResultVo result = new ResultVo();
+        List<Map<String, String>> list = articleMapper.queryIndexImage();
+        result.setCode(200);
+        result.setOk(true);
+        result.setData(list);
+        return result;
     }
 }

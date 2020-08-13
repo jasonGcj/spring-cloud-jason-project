@@ -39,4 +39,8 @@
         INSERT INTO t_bas_article_info (id,title,summary,is_top,traffic)
     </insert>
 
+    <select id="queryIndexImage" resultType="map">
+    select  id,image_type as type,post_title,post_medium_image from t_bas_image
+    </select>
+
 </mapper>

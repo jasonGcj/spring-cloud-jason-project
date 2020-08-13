@@ -15,4 +15,7 @@ public interface ArticleService {
     ResultVo queryArticleById(String id);
 
     ResultVo addSomeOneArticle(ArticleDto dto);
+
+    ResultVo queryIndexImage();
+
 }

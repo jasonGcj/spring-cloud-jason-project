@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName ArticleMapper
@@ -20,4 +21,7 @@ public interface ArticleMapper {
     ArticleVo queryArticleById(@Param("id") String id);
 
     void addSomeOneArticle(ArticleDto dto);
+
+    List<Map<String,String>> queryIndexImage();
+
 }
