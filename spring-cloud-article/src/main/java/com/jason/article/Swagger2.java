@@ -32,10 +32,10 @@ public class Swagger2 {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Wmyskxz个人博客RESTful APIs")
-                .description("原文地址链接：http://blog.didispace.com/springbootswagger2/")
+                .title("JasonGu个人博客RESTful APIs")
+                .description("更多的博客文章请关注我：......")
                 .termsOfServiceUrl("http://blog.didispace.com/")
-                .contact("@我没有三颗心脏")
+                .contact("@难言之隐")
                 .version("1.0")
                 .build();
     }

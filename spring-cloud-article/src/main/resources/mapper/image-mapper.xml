@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jason.article.mapper.ImageMapper">
+
+    <select id="queryIndexImage" resultType="map">
+    select  id,image_type as type,post_title,post_medium_image from t_bas_image order by image_sort asc limit 5
+    </select>
+
+</mapper>

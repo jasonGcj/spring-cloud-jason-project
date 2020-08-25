@@ -1,7 +1,7 @@
 package com.jason.article.controller;
 
 import com.jason.article.domain.ArticleDto;
-import com.jason.article.service.impl.ArticleService;
+import com.jason.article.service.ArticleService;
 import com.jason.domain.ResultVo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;

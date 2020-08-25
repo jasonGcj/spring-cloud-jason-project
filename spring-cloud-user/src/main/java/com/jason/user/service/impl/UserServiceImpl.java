@@ -135,6 +135,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ResultVo loginUser(UserInfoDto userInfo) {
+        LOGGER.info("user is login:{}",JSON.toJSONString(userInfo.getUserName()));
         ResultVo result = new ResultVo();
         String userName = userInfo.getUserName();
         String passWord = userInfo.getPassWord();
@@ -171,6 +172,10 @@ public class UserServiceImpl implements UserService {
                 result.setOk(true);
                 return result;
             }
+        }else{
+            result.setMessage("该用户不存在");
+            result.setOk(false);
+            return result;
         }
             result.setMessage("验证失败,密码错误");
             result.setOk(false);
