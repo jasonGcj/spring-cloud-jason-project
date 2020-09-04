@@ -19,12 +19,12 @@ import java.util.Map;
  */
 public class JwtUtil {
     //过期时间
-    private static final long EXPIRE_TIME = 15 * 60 * 1000;
+    private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000;
     //私钥
     private static final String TOKEN_SECRET = "privateKey";
 
     /**
-     * 生成签名，15分钟过期
+     * 生成签名，一天之后过期
      * @param **username**
      * @param **password**
      * @return

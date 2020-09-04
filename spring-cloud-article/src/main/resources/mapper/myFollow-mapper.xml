@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jason.article.mapper.MyFollowMapper">
+
+    <resultMap id="BaseResultMap" type="com.jason.article.domain.MyFollowEntity">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="category_thumbnail_image" jdbcType="VARCHAR" property="categoryThumbnailImage" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="subimg" jdbcType="VARCHAR" property="subimg" />
+        <result column="count" jdbcType="INTEGER" property="count" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+        <result column="create_user_acount" jdbcType="VARCHAR" property="createUserAcount" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="links" jdbcType="VARCHAR" property="links" />
+        <result column="link" jdbcType="VARCHAR" property="link" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, category_thumbnail_image, name, description, subimg, count, create_time, modify_time,
+        create_user_acount, user_id
+    </sql>
+
+    <insert id="saveMyFollowInfo" parameterType="com.jason.article.dto.MyFollowDto">
+        insert into t_my_follow (id, category_thumbnail_image, name,
+        description, subimg, count,
+        create_time, modify_time, create_user_acount,
+        user_id, links,link)
+        values (#{id,jdbcType=VARCHAR}, #{categoryThumbnailImage,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR}, #{subimg,jdbcType=VARCHAR}, #{count,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, #{createUserAcount,jdbcType=VARCHAR},
+        #{userId,jdbcType=VARCHAR}, #{links,jdbcType=LONGVARCHAR},#{link,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="queryMyFollowInfoByUserId" parameterType="string" resultMap="BaseResultMap">
+        select
+            <include refid="Base_Column_List" />
+            from t_my_follow where user_id = #{userId,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

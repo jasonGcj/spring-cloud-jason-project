@@ -41,15 +41,23 @@ public class ImageServiceImpl implements IImageService {
         /**
          * 验证缓存是否存在
          */
-        if(redisTemplate.hasKey(CACHE_INDEX_IMAGE)){
-            redisList= redisTemplate.opsForList().range(CACHE_INDEX_IMAGE, 0, -1);
-            if(!CollectionUtils.isEmpty(redisList)){
-                result.setData(redisList);
+        try {
+            if(redisTemplate.hasKey(CACHE_INDEX_IMAGE)){
+                redisList= redisTemplate.opsForList().range(CACHE_INDEX_IMAGE, 0, -1);
+                if(!CollectionUtils.isEmpty(redisList)){
+                    result.setData(redisList);
+                }else{
+                    redisList = operateReids();
+                }
             }else{
                 redisList = operateReids();
             }
-        }else{
-            redisList = operateReids();
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setCode(500);
+            result.setOk(true);
+            result.setMessage("系统异常:"+e.getMessage());
+            return result;
         }
         result.setData(redisList);
         result.setCode(200);
