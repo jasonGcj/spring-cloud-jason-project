@@ -1,6 +1,6 @@
 package com.jason.article.controller;
 
-import com.jason.article.domain.ArticleDto;
+import com.jason.article.dto.ArticleDto;
 import com.jason.article.service.ArticleService;
 import com.jason.domain.ResultVo;
 import io.swagger.annotations.ApiImplicitParam;
@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @ClassName ArticleController
@@ -37,9 +39,14 @@ public class ArticleController {
     }
 
     @ApiOperation("添加文章")
-    @PostMapping("/addSomeOneArticle")
-    public ResultVo addSomeOneArticle(@RequestBody ArticleDto dto){
-        return articleService.addSomeOneArticle(dto);
+    @PostMapping("/saveArticleInfo")
+    public List<ResultVo> saveArticleInfo(@RequestBody List<ArticleDto> lists){
+        ArrayList<ResultVo> list = new ArrayList<>();
+        for (ArticleDto articleDto : lists) {
+            ResultVo resultVo = articleService.saveArticleInfo(articleDto);
+            list.add(resultVo);
+        }
+        return list;
     }
 
 }

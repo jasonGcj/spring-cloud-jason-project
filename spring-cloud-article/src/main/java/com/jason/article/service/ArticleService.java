@@ -1,6 +1,6 @@
 package com.jason.article.service;
 
-import com.jason.article.domain.ArticleDto;
+import com.jason.article.dto.ArticleDto;
 import com.jason.domain.ResultVo;
 
 /**
@@ -28,6 +28,6 @@ public interface ArticleService {
      * @param dto
      * @return
      */
-    ResultVo addSomeOneArticle(ArticleDto dto);
+    ResultVo saveArticleInfo(ArticleDto dto);
 
 }

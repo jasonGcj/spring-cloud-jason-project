@@ -1,18 +1,18 @@
 package com.jason.article.service.impl;
 
-import com.jason.article.domain.ArticleDto;
+import com.jason.article.domain.ArticleEntity;
+import com.jason.article.dto.ArticleDto;
 import com.jason.article.domain.ArticleVo;
 import com.jason.article.mapper.ArticleMapper;
 import com.jason.article.service.ArticleService;
 import com.jason.domain.ResultVo;
+import com.jason.utils.UUidUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 /**
  * @ClassName ArticleServiceImpl
@@ -29,7 +29,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public ResultVo queryArticle() {
         ResultVo result = new ResultVo();
-        List<ArticleVo> list = articleMapper.queryArticle();
+        List<ArticleEntity> list = articleMapper.queryArticle();
         result.setData(list);
         return result;
 
@@ -44,10 +44,22 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ResultVo addSomeOneArticle(ArticleDto dto) {
+    public ResultVo saveArticleInfo(ArticleDto dto) {
         ResultVo result = new ResultVo();
-        articleMapper.addSomeOneArticle(dto);
-        return null;
+        dto.setCreateTime(new Date());
+        dto.setId(UUidUtils.getUUid());
+        try {
+            articleMapper.saveArticleInfo(dto);
+        } catch (Exception e) {
+            result.setCode(500);
+            result.setOk(false);
+            result.setMessage("文章保存失败:"+e.getMessage());
+           return result;
+        }
+        result.setCode(200);
+        result.setOk(true);
+        result.setMessage("文章保存成功");
+        return result;
     }
 
 

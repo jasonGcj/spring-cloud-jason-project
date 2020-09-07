@@ -3,20 +3,28 @@
 
 <mapper namespace="com.jason.article.mapper.ArticleMapper">
 
-    <select id="queryArticle" resultType="com.jason.article.domain.ArticleVo">
-      SELECT
-        t.id as id,
-        t.title as title,
-        t.summary as summary,
-        t.is_top as isTop,
-        t.traffic as traffic,
-        t.create_time as createTime,
-        t.modify_time as modifyTime,
-        c.content as content
-        FROM
-            t_bas_article_info t
-        LEFT JOIN t_bas_article_content c ON t.id = c.article_id
-        ORDER BY t.create_time desc LIMIT 10
+    <resultMap id="BaseResultMap" type="com.jason.article.domain.ArticleEntity">
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="post_medium_image" jdbcType="VARCHAR" property="postMediumImage" />
+        <result column="link" jdbcType="VARCHAR" property="link" />
+        <result column="author" jdbcType="VARCHAR" property="author" />
+        <result column="excerpt" jdbcType="VARCHAR" property="excerpt" />
+        <result column="like_count" jdbcType="INTEGER" property="likeCount" />
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+        <result column="post_date" jdbcType="TIMESTAMP" property="postDate" />
+        <result column="pageviews" jdbcType="INTEGER" property="pageviews" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="create_user_acount" jdbcType="TIMESTAMP" property="createUserAcount" />
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, title, post_medium_image, link, author, excerpt, like_count, category_name, post_date,
+    pageviews, create_time, create_user_acount
+  </sql>
+    <select id="queryArticle" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_bas_article_info
     </select>
 
     <select id="queryArticleById" resultType="com.jason.article.domain.ArticleVo">
@@ -35,8 +43,15 @@
         AND t.id = #{id} LIMIT 1
     </select>
 
-    <insert id="addSomeOneArticle">
-        INSERT INTO t_bas_article_info (id,title,summary,is_top,traffic)
+    <insert id="saveArticleInfo" parameterType="com.jason.article.dto.ArticleDto">
+        insert into t_bas_article_info (id,title, post_medium_image, link,
+      author, excerpt, like_count,
+      category_name, post_date, pageviews,
+      create_time, create_user_acount)
+    values (#{id,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR}, #{postMediumImage,jdbcType=VARCHAR}, #{link,jdbcType=VARCHAR},
+      #{author,jdbcType=VARCHAR}, #{excerpt,jdbcType=VARCHAR}, #{likeCount,jdbcType=INTEGER},
+      #{categoryName,jdbcType=VARCHAR}, #{postDate,jdbcType=TIMESTAMP}, #{pageviews,jdbcType=INTEGER},
+      #{createTime,jdbcType=TIMESTAMP}, #{createUserAcount,jdbcType=TIMESTAMP})
     </insert>
 
     <select id="queryIndexImage" resultType="map">

@@ -1,6 +1,7 @@
 package com.jason.article.mapper;
 
-import com.jason.article.domain.ArticleDto;
+import com.jason.article.domain.ArticleEntity;
+import com.jason.article.dto.ArticleDto;
 import com.jason.article.domain.ArticleVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
@@ -16,11 +17,11 @@ import java.util.Map;
  */
 @Mapper
 public interface ArticleMapper {
-    List<ArticleVo> queryArticle();
+    List<ArticleEntity> queryArticle();
 
     ArticleVo queryArticleById(@Param("id") String id);
 
-    void addSomeOneArticle(ArticleDto dto);
+    void saveArticleInfo(ArticleDto dto);
 
     List<Map<String,String>> queryIndexImage();
 
