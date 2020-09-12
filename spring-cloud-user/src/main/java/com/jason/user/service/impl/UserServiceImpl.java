@@ -2,7 +2,8 @@ package com.jason.user.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.jason.consts.JasonConst;
+import com.jason.consts.JasonConstant;
+import com.jason.consts.RedisConstant;
 import com.jason.domain.ResultVo;
 import com.jason.message.ZxHttpUtil;
 import com.jason.user.domain.UserInfoDto;
@@ -14,7 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -38,7 +39,7 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 注册
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
             userInfoDto.setModifyTime(userInfoDto.getCreateTime());
             //MD5加密
             userInfoDto.setPassWord(Md5Util.md5password(passWord));
-            userInfoDto.setActive(JasonConst.STR_Y);
+            userInfoDto.setActive(JasonConstant.STR_Y);
             userMapper.registerUser(userInfoDto);
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,14 +159,17 @@ public class UserServiceImpl implements UserService {
                 Map<String, Object> map = new HashMap<>();
                 map.put("userName",userResult.getUserName());
                 map.put("passWord",userResult.getPassWord());
-                //生成Token
-                String token = JwtUtil.createToken(map);
-                LOGGER.info("token:"+token);
+                String token ="";
                 //1.大key  2.小key 3.Token 编码
-                if(!redisTemplate.hasKey(userName)){
-                    redisTemplate.opsForValue().set(userResult.getUserName(),token);
-                    redisTemplate.expire(userResult.getUserName(),1, TimeUnit.DAYS);
+                if(!stringRedisTemplate.hasKey(RedisConstant.LOGIN+userName)){
+                    //生成Token
+                    token = JwtUtil.createToken(map);
+                    stringRedisTemplate.opsForValue().set(RedisConstant.LOGIN+userName,token);
+                    stringRedisTemplate.expire(userResult.getUserName(),1, TimeUnit.DAYS);
+                }else{
+                    token = stringRedisTemplate.opsForValue().get(userResult.getUserName());
                 }
+                LOGGER.info("token:"+token);
                 result.setMessage("验证成功");
                 result.setData(token);
                 result.setCode(200);
@@ -196,7 +200,7 @@ public class UserServiceImpl implements UserService {
             result.setMessage("用户输入的验证码为空或空格");
         }
         try {
-            String phoneCode = (String) redisTemplate.opsForHash().get("phone", phone);
+            String phoneCode = (String) stringRedisTemplate.opsForHash().get("phone", phone);
             if(code.equals(phoneCode)){
                 result.setCode(200);
                 result.setOk(true);
@@ -232,7 +236,7 @@ public class UserServiceImpl implements UserService {
         int code = (int) ((Math.random() * 9 + 1) * 100000);
         try {
             String rep = ZxHttpUtil.sendPostMessage(phone,code);
-            redisTemplate.opsForHash().put("phone", phone,code+"");
+            stringRedisTemplate.opsForHash().put("phone", phone,code+"");
             JSONObject jsonObject = JSONObject.parseObject(rep);
             if(jsonObject != null){
                 String str = (String) jsonObject.get("result_msg");

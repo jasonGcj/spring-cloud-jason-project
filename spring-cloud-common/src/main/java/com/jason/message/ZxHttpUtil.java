@@ -1,6 +1,6 @@
 package com.jason.message;
 
-import com.jason.consts.MessageConst;
+import com.jason.consts.MessageConstant;
 import com.jason.utils.MessageUtil;
 
 import java.io.*;
@@ -32,17 +32,17 @@ public class ZxHttpUtil {
     public static String sendPostMessage( String phone ,int code) {
         String message = "用户你好,您在正在注册个人博客:"+code+",请勿告诉ta人";
         String ts = MessageUtil.getNowDateStr();
-        String passWord = MessageUtil.getMD5(MessageConst.ACCOUNT + MessageConst.PASSWORD + ts);// Md5签名(账号+密码+时间戳)
+        String passWord = MessageUtil.getMD5(MessageConstant.ACCOUNT + MessageConstant.PASSWORD + ts);// Md5签名(账号+密码+时间戳)
         Map<String, String> params = new HashMap<>();
-        params.put("account", MessageConst.ACCOUNT);
+        params.put("account", MessageConstant.ACCOUNT);
         params.put("pswd",passWord);
         params.put("mobile",phone);
         params.put("msg",message);
         params.put("ts", ts);
-        params.put("needstatus",MessageConst.NEED_STATUS);
+        params.put("needstatus", MessageConstant.NEED_STATUS);
         URL url = null;
         try {
-            url = new URL(MessageConst.URL);
+            url = new URL(MessageConstant.URL);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

@@ -1,17 +1,18 @@
 package com.jason.user.interceptor;
 
-import com.jason.utils.JwtUtil;
+import com.jason.consts.RedisConstant;
+import com.jason.utils.CurremtLimitingUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName JwtInterceptor
@@ -25,10 +26,11 @@ public class JwtInterceptor implements HandlerInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtInterceptor.class);
 
     @Autowired
-    RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
+
 
     /**
-     * redis 用不用都无所谓
+     * 做一些限流的操作
      * @param request
      * @param response
      * @param handler
@@ -37,38 +39,47 @@ public class JwtInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String header = request.getHeader("token");
-        String username = request.getHeader("username");
-        boolean result = this.checkUserIsLogin(header,username);
-        if(!result){
-            response.sendRedirect("http://localhost:1001/spring-cloud-user/user/error");
+        String ipAddress = CurremtLimitingUtils.getIPAddress(request);
+        String flag = this.rateOfFlow(ipAddress);
+        if("TIME_OUT".equals(flag)){
+            response.sendRedirect("http://localhost:1001/spring-cloud-user/test/error?message="+"TIME_OUT");
         }
         return true;
     }
 
     /**
-     * 验证用户登录信息
-     * @param header
+     * 限流
+     * @param ipAddress
      * @return
      */
-    private boolean checkUserIsLogin(String header,String username){
-
-        if(StringUtils.isBlank(header) || StringUtils.isBlank(username)){
-            LOGGER.error("请求头header is null");
-            return false;
+    public String  rateOfFlow(String ipAddress){
+        /**
+         * 验证黑名单
+         */
+        if(stringRedisTemplate.hasKey(RedisConstant.BLACK_LIST +ipAddress)){
+            String message = "ip:" + ipAddress + "操作太快了，请一分钟以后进行尝试";
+            LOGGER.info(message);
+            return "TIME_OUT";
         }
-
-        String token = null;
-        try {
-             token = redisTemplate.opsForValue().get(username).toString();
-        } catch (Exception e) {
-            return false;
+        /**
+         * 验证ip是否存在 然后计数
+         */
+        if(stringRedisTemplate.hasKey(ipAddress)){
+            if( stringRedisTemplate.getExpire(ipAddress)>-1){
+                Long increment = stringRedisTemplate.opsForValue().increment(ipAddress, 1L);
+                if(increment >= 10){
+                    /**
+                     * 访问受限 加入黑名单...
+                     */
+                    stringRedisTemplate.opsForValue().set(RedisConstant.BLACK_LIST+ipAddress,ipAddress, 1L,TimeUnit.MINUTES);
+                }
+            }else{
+                stringRedisTemplate.delete(ipAddress);
+            }
+        }else{
+            //设置过期时间
+            stringRedisTemplate.opsForValue().set(ipAddress,"1",10L,TimeUnit.SECONDS);
         }
-
-        if(!header.equals(token)){
-            return false;
-        }
-
-        return true;
+        return "SUCCESS";
     }
 }

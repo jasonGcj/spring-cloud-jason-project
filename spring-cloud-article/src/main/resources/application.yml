@@ -5,12 +5,12 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://111.231.116.214:1000/eureka/
+      defaultZone: http://localhost:1000/eureka/
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 spring:
   application:
-    name: cloud-user
+    name: spring-cloud-article
   redis:
     # Redis数据库索引（默认为0）
     database: 0
@@ -29,10 +29,10 @@ spring:
       min-idle: 0
       # 连接超时时间（毫秒）
       timeout: 5000
-    password: J
+    password: @
   datasource:
     username: root
-    password: J
+    password: !
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://111.231.116.214:3306/jasondb?characterEncoding=utf-8
   banner:

@@ -3,11 +3,9 @@ package com.jason.user.controller;
 import com.jason.domain.ResultVo;
 import com.jason.user.domain.UserInfoDto;
 import com.jason.user.service.UserService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -24,11 +22,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @RequestMapping("/hello")
-    public String hello(){
-        return "Weelcome to jason Home";
-    }
 
     /**
      * 注册用户
@@ -87,16 +80,6 @@ public class UserController {
     @RequestMapping("/updatePwd")
     public ResultVo updatePwd(@RequestBody Map<String,String> map){
         return userService.updatePwd(map);
-    }
-
-    /**
-     * 修改密码
-     * @param
-     * @return
-     */
-    @RequestMapping("/error")
-    public String errorLogin(){
-        return "logout";
     }
 
 }

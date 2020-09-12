@@ -6,7 +6,7 @@ package com.jason.consts;
  * @Author GCJ
  * @Date 2019/11/19 16:02
  */
-public class MessageConst {
+public class MessageConstant {
     public static final String ACCOUNT = "";
 
     public static final String PASSWORD = "";

@@ -1,12 +1,14 @@
 package com.jason.zuul.filter;
 
-import com.jason.utils.JwtUtil;
+import com.jason.consts.LoginStateConstant;
+import com.jason.consts.RedisConstant;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +26,12 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Component
 public class LoginFilter extends ZuulFilter {
 
+    public static final String USER_URL ="/spring-cloud-user/user";
+
+    public static final String ARTICLE_URL ="/spring-cloud-article/image";
+
     @Autowired
-    RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 过滤器类型，前置过滤器
@@ -53,33 +59,61 @@ public class LoginFilter extends ZuulFilter {
     public boolean shouldFilter() {
         RequestContext requestContext = RequestContext.getCurrentContext();
         HttpServletRequest request = requestContext.getRequest();
+        /**
+         * 这些url不会验证登录规则
+         */
+        if(request.getRequestURI().contains(USER_URL) || request.getRequestURI().contains(ARTICLE_URL)
+        ){
+            return false;
+        }
         return true;
     }
 
+    /**
+     * 做一些网关上的效验
+     * @return
+     * @throws ZuulException
+     */
     @Override
     public Object run() throws ZuulException {
         //JWT
         RequestContext requestContext =  RequestContext.getCurrentContext();
         HttpServletRequest request = requestContext.getRequest();
-
-        //token对象
-        String token = request.getHeader("token");
-
-        //如果token字符串为空
-        if(StringUtils.isBlank((token))){
-            token  = request.getParameter("token");
-        }
-
-        String User = JwtUtil.checkToken(token);
-
-        //登录校验逻辑  根据公司情况自定义 JWT
-        if (StringUtils.isBlank(User)) {
+        String header = request.getHeader("token");
+        String username = request.getHeader("username");
+        boolean result = this.checkUserIsLogin(header,username);
+        if(!result){
             //设置为false则不往下走(不调用api接口)
             requestContext.setSendZuulResponse(false);
             //响应一个状态码：401
             requestContext.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
-            requestContext.setResponseBody("Token is fail");
+            requestContext.setResponseBody(LoginStateConstant.NO_LOGIN);
         }
-        return null;
+        return true;
+    }
+
+    /**
+     * 验证用户登录信息
+     * @param header
+     * @return
+     */
+    private boolean checkUserIsLogin(String header,String username){
+
+        if(StringUtils.isBlank(header) || StringUtils.isBlank(username)){
+            return false;
+        }
+
+        String token = null;
+        try {
+            token = stringRedisTemplate.opsForValue().get(RedisConstant.LOGIN+username).toString();
+        } catch (Exception e) {
+            return false;
+        }
+
+        if(!header.equals(token)){
+            return false;
+        }
+
+        return true;
     }
 }
