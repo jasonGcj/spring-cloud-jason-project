@@ -1,11 +1,16 @@
 package com.jason.user.interceptor;
 
+import com.alibaba.fastjson.JSON;
 import com.jason.consts.RedisConstant;
+import com.jason.domain.UserEntity;
+import com.jason.user.UserContext;
 import com.jason.utils.CurremtLimitingUtils;
+import com.jason.utils.RequestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -28,7 +33,6 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-
     /**
      * 做一些限流的操作
      * @param request
@@ -41,9 +45,11 @@ public class JwtInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String ipAddress = CurremtLimitingUtils.getIPAddress(request);
         String flag = this.rateOfFlow(ipAddress);
+        RequestUtils.setUserRequest(request);
         if("TIME_OUT".equals(flag)){
-            response.sendRedirect("http://localhost:1001/spring-cloud-user/test/error?message="+"TIME_OUT");
+             response.sendRedirect("http://localhost:1001/spring-cloud-user/test/error?message="+"TIME_OUT");
         }
+        LOGGER.info(Thread.currentThread()+":"+ JSON.toJSONString(UserContext.getCurrentUser()));
         return true;
     }
 

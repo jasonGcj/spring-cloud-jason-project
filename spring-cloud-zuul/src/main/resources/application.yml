@@ -21,7 +21,7 @@ spring:
       min-idle: 0
       # 连接超时时间（毫秒）
       timeout: 5000
-    password:
+    password: @
     banner:
       location: com\jason\server\banner.txt
 zuul:
@@ -53,4 +53,6 @@ eureka:
   client:
     #注册中心地址
     service-url:
-      defaultZone: http://localhost:1000/eureka/
+      defaultZone: http://111.231.116.214:1000/eureka/
+logging:
+  file: /jason/jar/log/zuul.log

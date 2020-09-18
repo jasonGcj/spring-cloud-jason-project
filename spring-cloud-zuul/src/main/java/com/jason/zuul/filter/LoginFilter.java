@@ -1,11 +1,17 @@
 package com.jason.zuul.filter;
 
+import com.alibaba.fastjson.JSON;
 import com.jason.consts.LoginStateConstant;
 import com.jason.consts.RedisConstant;
+import com.jason.domain.UserEntity;
+import com.jason.user.IUser;
+import com.jason.user.UserContext;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,6 +31,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  */
 @Component
 public class LoginFilter extends ZuulFilter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginFilter.class);
 
     public static final String USER_URL ="/spring-cloud-user/user";
 
@@ -89,6 +97,7 @@ public class LoginFilter extends ZuulFilter {
             requestContext.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
             requestContext.setResponseBody(LoginStateConstant.NO_LOGIN);
         }
+
         return true;
     }
 
@@ -113,7 +122,6 @@ public class LoginFilter extends ZuulFilter {
         if(!header.equals(token)){
             return false;
         }
-
         return true;
     }
 }

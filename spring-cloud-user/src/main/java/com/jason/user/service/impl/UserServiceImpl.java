@@ -165,9 +165,9 @@ public class UserServiceImpl implements UserService {
                     //生成Token
                     token = JwtUtil.createToken(map);
                     stringRedisTemplate.opsForValue().set(RedisConstant.LOGIN+userName,token);
-                    stringRedisTemplate.expire(userResult.getUserName(),1, TimeUnit.DAYS);
+                    stringRedisTemplate.expire(RedisConstant.LOGIN+userName,1, TimeUnit.DAYS);
                 }else{
-                    token = stringRedisTemplate.opsForValue().get(userResult.getUserName());
+                    token = stringRedisTemplate.opsForValue().get(RedisConstant.LOGIN+userName);
                 }
                 LOGGER.info("token:"+token);
                 result.setMessage("验证成功");
@@ -176,14 +176,10 @@ public class UserServiceImpl implements UserService {
                 result.setOk(true);
                 return result;
             }
-        }else{
-            result.setMessage("该用户不存在");
-            result.setOk(false);
-            return result;
         }
-            result.setMessage("验证失败,密码错误");
-            result.setOk(false);
-            return result;
+        result.setMessage("密码输入错误");
+        result.setOk(false);
+        return result;
     }
 
     @Override

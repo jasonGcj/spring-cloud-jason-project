@@ -13,5 +13,7 @@ eureka:
 spring:
   application:
     name: eurka-server
+logging:
+  file: /jason/jar/log/eureka.log
 
 
