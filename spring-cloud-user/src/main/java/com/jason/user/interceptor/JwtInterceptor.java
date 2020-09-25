@@ -2,15 +2,12 @@ package com.jason.user.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.jason.consts.RedisConstant;
-import com.jason.domain.UserEntity;
 import com.jason.user.UserContext;
 import com.jason.utils.CurremtLimitingUtils;
 import com.jason.utils.RequestUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;

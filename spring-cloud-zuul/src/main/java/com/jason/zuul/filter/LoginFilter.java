@@ -6,6 +6,7 @@ import com.jason.consts.RedisConstant;
 import com.jason.domain.UserEntity;
 import com.jason.user.IUser;
 import com.jason.user.UserContext;
+import com.jason.utils.CurremtLimitingUtils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
@@ -90,14 +91,16 @@ public class LoginFilter extends ZuulFilter {
         String header = request.getHeader("token");
         String username = request.getHeader("username");
         boolean result = this.checkUserIsLogin(header,username);
+        String ipAddress = CurremtLimitingUtils.getIPAddress(request);
         if(!result){
+            LOGGER.info(ipAddress+":用户未登录");
             //设置为false则不往下走(不调用api接口)
             requestContext.setSendZuulResponse(false);
             //响应一个状态码：401
             requestContext.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
             requestContext.setResponseBody(LoginStateConstant.NO_LOGIN);
         }
-
+        LOGGER.info(ipAddress+":效验通过开始访问......."+":"+request.getServerName());
         return true;
     }
 

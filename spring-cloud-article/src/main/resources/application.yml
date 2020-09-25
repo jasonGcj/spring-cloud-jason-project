@@ -2,15 +2,15 @@ server:
   port: 1003
   servlet:
     context-path: /spring-cloud-article
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://111.231.116.214:1000/eureka/
 mybatis:
   mapper-locations: classpath:mapper/*.xml
 spring:
   application:
-    name: spring-cloud-article
+    name: zk-article
+  cloud:
+    zookeeper:
+      ###当前服务注册到zookeeper注册中心
+      connect-string: 111.231.116.214:2181
   redis:
     # Redis数据库索引（默认为0）
     database: 0
@@ -29,16 +29,16 @@ spring:
       min-idle: 0
       # 连接超时时间（毫秒）
       timeout: 5000
-    password: 1@
+    password: @
   datasource:
     username: root
-    password: 1!
+    password: !
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://cdb-kxgs3wua.cd.tencentcdb.com:10117/jasondb?characterEncoding=utf-8
   banner:
     location: com\jason\server\banner.txt
 logging:
-  file: /jason/jar/log/article.log
+  file: /jason/jar/log/article/article.log
 
 
 
