@@ -4,8 +4,8 @@
 <mapper namespace="com.jason.user.mapper.UserMapper">
 
         <insert id="registerUser" parameterType="com.jason.user.domain.UserInfoDto">
-         INSERT INTO t_bas_user (id,username,password,phone_number,create_time,modify_time,active)
-         VALUES (#{id},#{userName},#{passWord},#{phoneNumber},#{createTime},#{modifyTime},#{active})
+         INSERT INTO t_bas_user (id,account,username,password,phone_number,create_time,modify_time,active)
+         VALUES (#{id},#{account},#{userName},#{passWord},#{phoneNumber},#{createTime},#{modifyTime},#{active})
         </insert>
 
         <select id="checkUserName" resultType="string">
@@ -17,7 +17,8 @@
              SELECT
              id as id,
              username as userName,
-             password as passWord
+             password as passWord,
+             account as account
              FROM t_bas_user
              WHERE
              username = #{userName}
@@ -31,6 +32,10 @@
 
         <select id="updatePwd" parameterType="com.jason.user.domain.UserInfoDto">
             update t_bas_user set password = #{passWord} where id = #{id}
+        </select>
+
+        <select id="checkUserAccount" parameterType="long" resultType="int">
+            select count(*) from t_bas_user where account = #{account}
         </select>
 
 

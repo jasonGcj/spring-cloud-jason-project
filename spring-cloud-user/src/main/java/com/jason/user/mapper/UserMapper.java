@@ -21,4 +21,6 @@ public interface UserMapper {
     int checkUserPhone(@Param("phone")String phone);
 
     void updatePwd(UserInfoDto userInfoDto);
+
+    int checkUserAccount(long account);
 }

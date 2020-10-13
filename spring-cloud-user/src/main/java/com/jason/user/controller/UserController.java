@@ -38,7 +38,7 @@ public class UserController {
      * @return
      */
     @RequestMapping("/login")
-    public ResultVo loginUser(@RequestBody UserInfoDto userInfo){
+    public ResultVo loginUser(@RequestBody UserInfoDto userInfo) throws Exception {
         return userService.loginUser(userInfo);
     }
 

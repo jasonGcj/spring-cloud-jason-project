@@ -7,6 +7,7 @@ import com.jason.consts.RedisConstant;
 import com.jason.domain.ResultVo;
 import com.jason.message.ZxHttpUtil;
 import com.jason.user.domain.UserInfoDto;
+import com.jason.user.domain.UserInfoEntity;
 import com.jason.user.mapper.UserMapper;
 import com.jason.user.service.UserService;
 import com.jason.utils.JwtUtil;
@@ -18,10 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,6 +40,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    private static final String USER = "USER_";
 
     /**
      * 注册
@@ -79,9 +81,23 @@ public class UserServiceImpl implements UserService {
                 LOGGER.info("用户名已存在:"+user);
                 return result;
             }
-
+            long account = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
+            String key = USER + account;
+            String value = account+"";
+            /**
+             * 当账号重复的时候
+             */
+            if(stringRedisTemplate.hasKey(key)){
+                LOGGER.info("并发数据:"+key+"重新生成账号");
+                account = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
+                int var = userMapper.checkUserAccount(account);
+                account = var == 0 ? account : getRandomNickname(10);
+                LOGGER.info("生成后的账号:"+account);
+            }
+            stringRedisTemplate.opsForValue().set(key,value,1,TimeUnit.SECONDS);
             //注册信息
             userInfoDto.setId(UUID.randomUUID().toString());
+            userInfoDto.setAccount(account);
             userInfoDto.setCreateTime(new Date());
             userInfoDto.setModifyTime(userInfoDto.getCreateTime());
             //MD5加密
@@ -145,6 +161,7 @@ public class UserServiceImpl implements UserService {
             return result;
         }
 
+
         /**
          * 验证用户名密码长度  后期优化
          */
@@ -170,8 +187,12 @@ public class UserServiceImpl implements UserService {
                     token = stringRedisTemplate.opsForValue().get(RedisConstant.LOGIN+userName);
                 }
                 LOGGER.info("token:"+token);
+                UserInfoEntity user = new UserInfoEntity();
+                user.setToken(token);
+                user.setAccount(userResult.getAccount());
+                user.setUsername(userResult.getUserName());
                 result.setMessage("验证成功");
-                result.setData(token);
+                result.setData(user);
                 result.setCode(200);
                 result.setOk(true);
                 return result;
@@ -311,5 +332,20 @@ public class UserServiceImpl implements UserService {
         }
         return false;
     }
+
+    /**
+     * 生成重复数字
+     * @param length
+     * @return
+     */
+    public static long getRandomNickname(int length) {
+        String val = "";
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            val += String.valueOf(random.nextInt(10));
+        }
+        return Long.valueOf(val);
+    }
+
 
 }

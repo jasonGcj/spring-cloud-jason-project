@@ -21,6 +21,8 @@ public class UserInfoDto implements Serializable {
 
     private String phoneNumber;
 
+    private long account;
+
     private Date createTime;
 
     private Date modifyTime;
@@ -81,5 +83,13 @@ public class UserInfoDto implements Serializable {
 
     public void setModifyTime(Date modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public long getAccount() {
+        return account;
+    }
+
+    public void setAccount(long account) {
+        this.account = account;
     }
 }
