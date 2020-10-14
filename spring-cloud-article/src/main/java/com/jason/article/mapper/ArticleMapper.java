@@ -19,7 +19,7 @@ import java.util.Map;
 public interface ArticleMapper {
     List<ArticleEntity> queryArticle();
 
-    ArticleVo queryArticleById(@Param("id") String id);
+    ArticleEntity queryArticleById(@Param("id") String id);
 
     void saveArticleInfo(ArticleDto dto);
 

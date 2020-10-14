@@ -1,12 +1,14 @@
 package com.jason.domain;
 
+import java.io.Serializable;
+
 /**
  * @ClassName ResultVo
  * @Description TODO
  * @Author GCJ
  * @Date 2019/11/11 9:33
  */
-public class ResultVo {
+public class ResultVo implements Serializable {
 
     private String message;
 
@@ -17,6 +19,35 @@ public class ResultVo {
     private Object data;
 
     private boolean ok;
+
+    public ResultVo(boolean ok,int code,String message){
+        this.ok = ok;
+        this.code = code;
+        this.message = message;
+
+    }
+
+    public ResultVo(boolean ok,int code,String message,Object data){
+        ResultVo resultVo = new ResultVo();
+        this.ok = ok;
+        this.code = code;
+        this.message = message;
+        this.total = total;
+        this.data = data;
+    }
+
+    public ResultVo(boolean ok,int code,String message,int total,Object data){
+        ResultVo resultVo = new ResultVo();
+        this.ok = ok;
+        this.code = code;
+        this.message = message;
+        this.total = total;
+        this.data = data;
+    }
+
+    public ResultVo(){
+
+    }
 
     public String getMessage() {
         return message;

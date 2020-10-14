@@ -1,6 +1,7 @@
 package com.jason.article.service;
 
 import com.jason.article.dto.ArticleDto;
+import com.jason.article.dto.ArticleLikeDto;
 import com.jason.domain.ResultVo;
 
 /**
@@ -29,5 +30,10 @@ public interface ArticleService {
      * @return
      */
     ResultVo saveArticleInfo(ArticleDto dto);
-
+    /**
+     * 文章点赞 / 收藏
+     * @param dto
+     * @return
+     */
+    ResultVo operateArticle(ArticleLikeDto dto);
 }

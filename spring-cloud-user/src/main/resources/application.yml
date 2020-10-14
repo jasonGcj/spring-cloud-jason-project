@@ -35,7 +35,7 @@ spring:
     username: root
     password: !
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://cdb-kxgs3wua.cd.tencentcdb.com:10117/jasondb?characterEncoding=utf-8
+    url: jdbc:mysql://cdb-kxgs3wua.cd.tencentcdb.com:10117/jasondb?characterEncoding=utf-8&useSSL=false
   banner:
     location: com\jason\server\banner.txt
 logging:
