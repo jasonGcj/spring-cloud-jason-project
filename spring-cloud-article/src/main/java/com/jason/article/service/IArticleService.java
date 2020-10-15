@@ -4,13 +4,15 @@ import com.jason.article.dto.ArticleDto;
 import com.jason.article.dto.ArticleLikeDto;
 import com.jason.domain.ResultVo;
 
+import java.util.Map;
+
 /**
  * @ClassName ArticleService
  * @Description TODO
  * @Author GCJ
  * @Date 2019/12/2 11:07
  */
-public interface ArticleService {
+public interface IArticleService {
     /**
      * 获取所有文章列表
      * @return
@@ -36,4 +38,6 @@ public interface ArticleService {
      * @return
      */
     ResultVo operateArticle(ArticleLikeDto dto);
+
+    void asyncArticleRelation(long account,Map<String, Object> map);
 }

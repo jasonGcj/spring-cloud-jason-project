@@ -68,7 +68,7 @@ public class ArticleDto implements Serializable {
     /**
      * 创建的用户
      */
-    private Date createUserAcount;
+    private long createUserAcount;
 
     private static final long serialVersionUID = 1L;
 
@@ -160,11 +160,11 @@ public class ArticleDto implements Serializable {
         this.createTime = createTime;
     }
 
-    public Date getCreateUserAcount() {
+    public long getCreateUserAcount() {
         return createUserAcount;
     }
 
-    public void setCreateUserAcount(Date createUserAcount) {
+    public void setCreateUserAcount(long createUserAcount) {
         this.createUserAcount = createUserAcount;
     }
 }

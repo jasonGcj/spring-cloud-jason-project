@@ -2,12 +2,12 @@ package com.jason.article.service.impl;
 
 import com.jason.article.domain.ArticleEntity;
 import com.jason.article.dto.ArticleDto;
-import com.jason.article.domain.ArticleVo;
 import com.jason.article.dto.ArticleLikeDto;
 import com.jason.article.mapper.ArticleMapper;
-import com.jason.article.service.ArticleService;
+import com.jason.article.service.IArticleService;
 import com.jason.domain.ResultVo;
 import com.jason.enums.LikedStatusEnum;
+import com.jason.utils.FastjsonUtil;
 import com.jason.utils.RedisKeyUtil;
 import com.jason.utils.UUidUtils;
 import org.apache.commons.lang.StringUtils;
@@ -16,11 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @ClassName ArticleServiceImpl
@@ -29,7 +28,7 @@ import java.util.Set;
  * @Date 2019/12/2 11:07
  */
 @Service
-public class ArticleServiceImpl implements ArticleService {
+public class ArticleServiceImpl implements IArticleService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MyFollowServiceImpl.class);
 
@@ -87,23 +86,44 @@ public class ArticleServiceImpl implements ArticleService {
         return new ResultVo(false,500,"操作类型不对");
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void asyncArticleRelation(long account,Map<String, Object> map) {
+        articleMapper.deleteArticleRelationByAccount(account);
+        articleMapper.saveArticleRelation(map);
+    }
+
     /**
      * 收藏
      * @param dto
      * @return
      */
     private ResultVo articleCollect(ArticleLikeDto dto) {
+        String articleId = dto.getArticleId();
         /**
          * 收藏 / 取消收藏
          */
-        Set<String> str = new HashSet<>();
-        str.add(dto.getArticleId());
         if(LikedStatusEnum.COLLECT.getCode().equals(dto.getLikeStatus())){
-            //stringRedisTemplate.opsForHash().put(RedisKeyUtil.MAP_KEY_ART_COLLECT,dto.getAccount());
+            String str = (String) stringRedisTemplate.opsForHash().get(RedisKeyUtil.MAP_KEY_ART_COLLECT, dto.getAccount());
+            Set<String> articlelSet = str == null ? new HashSet<>() : FastjsonUtil.deserializeToSet(str, String.class);
+            for (String s : articlelSet) {
+                if(articleId.equals(s))
+                    return new ResultVo(false,500,"已经收藏过了");
+            }
+            articlelSet.add(articleId);
+            stringRedisTemplate.opsForHash().put(RedisKeyUtil.MAP_KEY_ART_COLLECT,dto.getAccount(),FastjsonUtil.serialize(articlelSet));
+            stringRedisTemplate.opsForHash().increment(RedisKeyUtil.MAP_KEY_ART_COLLECT_COUNT,dto.getAccount(),1);
+            return new ResultVo(true,200,"收藏成功");
         }else{
+            String str = (String) stringRedisTemplate.opsForHash().get(RedisKeyUtil.MAP_KEY_ART_COLLECT, dto.getAccount());
+            Set<String> articlelSet = str == null ? new HashSet<>() : FastjsonUtil.deserializeToSet(str, String.class);
+            if(null == str || CollectionUtils.isEmpty(articlelSet))
+                return new ResultVo(false,500,"此文章你还为收藏");
+            articlelSet.remove(articleId);
+            stringRedisTemplate.opsForHash().put(RedisKeyUtil.MAP_KEY_ART_COLLECT,dto.getAccount(),FastjsonUtil.serialize(articlelSet));
+            stringRedisTemplate.opsForHash().increment(RedisKeyUtil.MAP_KEY_ART_COLLECT_COUNT,dto.getAccount(),-1);
+            return new ResultVo(true,200,"取消收藏成功");
         }
-
-        return null;
     }
 
     /**

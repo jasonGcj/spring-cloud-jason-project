@@ -42,11 +42,24 @@
     values (#{id,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR}, #{postMediumImage,jdbcType=VARCHAR}, #{link,jdbcType=VARCHAR},
       #{author,jdbcType=VARCHAR}, #{excerpt,jdbcType=VARCHAR}, #{likeCount,jdbcType=INTEGER},
       #{categoryName,jdbcType=VARCHAR}, #{postDate,jdbcType=TIMESTAMP}, #{pageviews,jdbcType=INTEGER},
-      #{createTime,jdbcType=TIMESTAMP}, #{createUserAcount,jdbcType=TIMESTAMP})
+      #{createTime,jdbcType=TIMESTAMP}, #{createUserAcount,jdbcType=VARCHAR})
     </insert>
 
     <select id="queryIndexImage" resultType="map">
     select  id,image_type as type,post_title,post_medium_image from t_bas_image
     </select>
+
+    <insert id="saveArticleRelation" parameterType="map">
+        insert into t_bas_article_relation (id,account,article_list,article_count,create_time)
+        values
+           (
+            #{id,jdbcType=VARCHAR},#{account,jdbcType=BIGINT}, #{articleList,jdbcType=VARCHAR},
+            #{articleCount,jdbcType=BIGINT},#{createTime,jdbcType=TIMESTAMP}
+            )
+    </insert>
+
+    <delete id="deleteArticleRelationByAccount" parameterType="long">
+        delete from t_bas_article_relation where account = #{account,jdbcType=BIGINT}
+    </delete>
 
 </mapper>

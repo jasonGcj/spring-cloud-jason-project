@@ -16,6 +16,5 @@ public class TestChar {
         char [] charPassword = new char [] {'U','n','k',  'w','o','n'};
         System.out.println("字符密码:"+ strPassword);
         System.out.println("字符密码:"+ charPassword);
-
     }
 }

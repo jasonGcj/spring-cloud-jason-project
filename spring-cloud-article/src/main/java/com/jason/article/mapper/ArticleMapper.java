@@ -6,6 +6,8 @@ import com.jason.article.domain.ArticleVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -25,4 +27,7 @@ public interface ArticleMapper {
 
     List<Map<String,String>> queryIndexImage();
 
+    void saveArticleRelation(Map<String,Object> map);
+
+    int deleteArticleRelationByAccount(long account);
 }

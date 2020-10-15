@@ -2,7 +2,7 @@ package com.jason.article.controller;
 
 import com.jason.article.dto.ArticleDto;
 import com.jason.article.dto.ArticleLikeDto;
-import com.jason.article.service.ArticleService;
+import com.jason.article.service.IArticleService;
 import com.jason.domain.ResultVo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @ClassName ArticleController
@@ -25,7 +24,7 @@ import java.util.Map;
 public class ArticleController {
 
     @Autowired
-    private ArticleService articleService;
+    private IArticleService articleService;
 
     @ApiOperation("获取所有文章列表")
     @GetMapping("/queryArticle")
