@@ -10,7 +10,5 @@ import com.jason.domain.ResultVo;
  * @Date 2020/9/4 14:44
  */
 public interface IMyFollowService {
-    ResultVo saveMyFollowInfo(MyFollowDto dto);
-
     ResultVo queryMyFollowInfoByUserId(String userId);
 }

@@ -30,4 +30,8 @@ public interface ArticleMapper {
     void saveArticleRelation(Map<String,Object> map);
 
     int deleteArticleRelationByAccount(long account);
+
+    void updateArticleInfo(Map<String, Object> map);
+
+    void deleteArticleRelation(Map<String, Object> map);
 }

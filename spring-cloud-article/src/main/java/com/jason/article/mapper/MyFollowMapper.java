@@ -1,5 +1,6 @@
 package com.jason.article.mapper;
 
+import com.jason.article.domain.ArticleEntity;
 import com.jason.article.domain.MyFollowEntity;
 import com.jason.article.dto.MyFollowDto;
 import com.jason.domain.ResultVo;
@@ -15,7 +16,6 @@ import java.util.List;
  */
 @Mapper
 public interface MyFollowMapper {
-    void saveMyFollowInfo(MyFollowDto dto);
 
-    List<MyFollowEntity> queryMyFollowInfoByUserId(String userId);
+    List<ArticleEntity> queryMyFollowInfoByUserId(String userId);
 }

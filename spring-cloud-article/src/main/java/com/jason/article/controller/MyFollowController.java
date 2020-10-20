@@ -22,12 +22,6 @@ public class MyFollowController {
     @Autowired
     private IMyFollowService myFollowService;
 
-    @ApiOperation("我的关注")
-    @PostMapping("/saveMyFollowInfo")
-    public ResultVo saveMyFollowInfo(@RequestBody MyFollowDto dto){
-        return myFollowService.saveMyFollowInfo(dto);
-    }
-
     @ApiOperation("查询我的关注")
     @ApiImplicitParam(name = "userId", value = "ID", required = true, dataType = "String")
     @GetMapping("/queryMyFollowInfoByUserId")

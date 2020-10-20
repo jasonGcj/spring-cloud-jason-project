@@ -41,11 +41,6 @@ public class ArticleEntity implements Serializable {
     private String excerpt;
 
     /**
-     * 喜欢的数量
-     */
-    private Integer likeCount;
-
-    /**
      * 小标题
      */
     private String categoryName;
@@ -69,6 +64,14 @@ public class ArticleEntity implements Serializable {
      * 创建的用户
      */
     private Date createUserAcount;
+    /**
+     * 点赞数量
+     */
+    private Integer likedCount;
+    /**
+     * 浏览数量
+     */
+    private Integer browseCount;
 
     private static final long serialVersionUID = 1L;
 
@@ -120,14 +123,6 @@ public class ArticleEntity implements Serializable {
         this.excerpt = excerpt;
     }
 
-    public Integer getLikeCount() {
-        return likeCount;
-    }
-
-    public void setLikeCount(Integer likeCount) {
-        this.likeCount = likeCount;
-    }
-
     public String getCategoryName() {
         return categoryName;
     }
@@ -166,5 +161,21 @@ public class ArticleEntity implements Serializable {
 
     public void setCreateUserAcount(Date createUserAcount) {
         this.createUserAcount = createUserAcount;
+    }
+
+    public Integer getLikedCount() {
+        return likedCount;
+    }
+
+    public void setLikedCount(Integer likedCount) {
+        this.likedCount = likedCount;
+    }
+
+    public Integer getBrowseCount() {
+        return browseCount;
+    }
+
+    public void setBrowseCount(Integer browseCount) {
+        this.browseCount = browseCount;
     }
 }

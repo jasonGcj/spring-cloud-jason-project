@@ -2,6 +2,7 @@ package com.jason.article.timer;
 
 import com.jason.article.mapper.ArticleMapper;
 import com.jason.article.service.IArticleService;
+import com.jason.service.RedisCacheService;
 import com.jason.utils.FastjsonUtil;
 import com.jason.utils.RedisKeyUtil;
 import com.jason.utils.UUidUtils;
@@ -26,7 +27,7 @@ import java.util.Set;
  * @Date 2020/10/15 12:34
  */
 @Component
-@EnableScheduling
+//@EnableScheduling
 public class ScheduleTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleTask.class);
@@ -34,16 +35,16 @@ public class ScheduleTask {
     @Autowired
     private IArticleService articleService;
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RedisCacheService redisCacheService;
 
     /**
-     * 定时任务异步刷新
+     * 定时任务异步刷新 每小时
      */
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 */1  *  *  * ?")
     public void asyncArticleRelation(){
         LOGGER.info("文章收藏定时任务开始执行刷新redis内容到mysql");
         long start = System.currentTimeMillis();
-        Map<Object, Object> redisMap = stringRedisTemplate.opsForHash().entries(RedisKeyUtil.MAP_KEY_ART_COLLECT);
+        Map<Object, Object> redisMap = redisCacheService.opsHash().entries(RedisKeyUtil.MAP_KEY_ART_COLLECT);
         if(!CollectionUtils.isEmpty(redisMap)){
             for (Map.Entry<Object, Object> entry : redisMap.entrySet()) {
                 Long account = null;
@@ -66,6 +67,55 @@ public class ScheduleTask {
         }
         long end = System.currentTimeMillis();
         LOGGER.info("文章收藏定时任务结束,用时->{}毫秒",(end - start));
+    }
 
+    /**
+     * 定时任务异步刷新 每小时
+     */
+    @Scheduled(cron = "0 */1 * * * ?")
+    public void asyncArticleInfo(){
+        LOGGER.info("文章点赞数任务开始执行刷新redis内容到mysql");
+        long start = System.currentTimeMillis();
+        Map<Object, Object> redisMap = redisCacheService.opsHash().entries(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT);
+        if(!CollectionUtils.isEmpty(redisMap)){
+            for (Map.Entry<Object, Object> entry : redisMap.entrySet()) {
+                String accountId = null;
+                int count = 0;
+                try {
+                    Map<String, Object> map = new HashMap<>();
+                    accountId = entry.getKey().toString();
+                    count = Integer.valueOf(entry.getValue().toString());
+                    map.put("id",accountId);
+                    map.put("likedCount",count);
+                    articleService.asyncArticleInfo(map);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error("异常回滚:->account{}",accountId);
+                    continue;
+                }
+            }
+        }
+        long end = System.currentTimeMillis();
+        LOGGER.info("文章浏览定时任务结束,用时->{}毫秒",(end - start));
+
+        Map<Object, Object> redisMap2 = redisCacheService.opsHash().entries(RedisKeyUtil.ARTICLE_COUNT);
+        if(!CollectionUtils.isEmpty(redisMap2)){
+            for (Map.Entry<Object, Object> entry : redisMap2.entrySet()) {
+                String accountId = null;
+                int count = 0;
+                try {
+                    Map<String, Object> map = new HashMap<>();
+                    accountId = entry.getKey().toString();
+                    count = Integer.valueOf(entry.getValue().toString());
+                    map.put("id",accountId);
+                    map.put("browseCount",count);
+                    articleService.asyncArticleInfo(map);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.error("异常回滚:->account{}",accountId);
+                    continue;
+                }
+            }
+        }
     }
 }

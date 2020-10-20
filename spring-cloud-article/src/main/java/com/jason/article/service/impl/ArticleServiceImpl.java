@@ -7,6 +7,7 @@ import com.jason.article.mapper.ArticleMapper;
 import com.jason.article.service.IArticleService;
 import com.jason.domain.ResultVo;
 import com.jason.enums.LikedStatusEnum;
+import com.jason.service.RedisCacheService;
 import com.jason.utils.FastjsonUtil;
 import com.jason.utils.RedisKeyUtil;
 import com.jason.utils.UUidUtils;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+
+import static com.jason.utils.RedisKeyUtil.MAP_KEY_ART_LIKED;
+import static com.jason.utils.RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT;
 
 /**
  * @ClassName ArticleServiceImpl
@@ -38,6 +42,9 @@ public class ArticleServiceImpl implements IArticleService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    private RedisCacheService redisCacheService;
+
     @Override
     public ResultVo queryArticle() {
         List<ArticleEntity> list = articleMapper.queryArticle();
@@ -49,12 +56,14 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     public ResultVo queryArticleById(String id) {
         ArticleEntity articleEntity = articleMapper.queryArticleById(id);
+        if(null !=articleEntity){
+            redisCacheService.mapIncrBy(RedisKeyUtil.ARTICLE_COUNT,id);
+        }
         return new ResultVo(true,200,"查询成功",articleEntity);
     }
 
     @Override
     public ResultVo saveArticleInfo(ArticleDto dto) {
-        ResultVo result = new ResultVo();
         dto.setCreateTime(new Date());
         dto.setId(UUidUtils.getUUid());
         try {
@@ -79,18 +88,34 @@ public class ArticleServiceImpl implements IArticleService {
         }
 
         if(1==dto.getOpeType()){
+            LOGGER.info("文章开始点赞");
             return articleLiked(dto);
         }else if(2==dto.getOpeType()){
+            LOGGER.info("文章开始收藏");
             return articleCollect(dto);
         }
         return new ResultVo(false,500,"操作类型不对");
     }
 
+    /**
+     * 异步刷新个人收藏的文章
+     * @param map
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void asyncArticleRelation(long account,Map<String, Object> map) {
         articleMapper.deleteArticleRelationByAccount(account);
         articleMapper.saveArticleRelation(map);
+    }
+
+    /**
+     * 异步刷新文章点赞数量
+     * @param map
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void asyncArticleInfo(Map<String, Object> map) {
+        articleMapper.updateArticleInfo(map);
     }
 
     /**
@@ -100,29 +125,35 @@ public class ArticleServiceImpl implements IArticleService {
      */
     private ResultVo articleCollect(ArticleLikeDto dto) {
         String articleId = dto.getArticleId();
+        String account = dto.getAccount();
+        String key = RedisKeyUtil.MAP_KEY_ART_COLLECT +account;
+
+        Boolean isOk = redisCacheService.isMember(key, articleId);
         /**
          * 收藏 / 取消收藏
          */
         if(LikedStatusEnum.COLLECT.getCode().equals(dto.getLikeStatus())){
-            String str = (String) stringRedisTemplate.opsForHash().get(RedisKeyUtil.MAP_KEY_ART_COLLECT, dto.getAccount());
-            Set<String> articlelSet = str == null ? new HashSet<>() : FastjsonUtil.deserializeToSet(str, String.class);
-            for (String s : articlelSet) {
-                if(articleId.equals(s))
-                    return new ResultVo(false,500,"已经收藏过了");
+            if(isOk){
+                return new ResultVo(false,500,"已经收藏过了");
             }
-            articlelSet.add(articleId);
-            stringRedisTemplate.opsForHash().put(RedisKeyUtil.MAP_KEY_ART_COLLECT,dto.getAccount(),FastjsonUtil.serialize(articlelSet));
-            stringRedisTemplate.opsForHash().increment(RedisKeyUtil.MAP_KEY_ART_COLLECT_COUNT,dto.getAccount(),1);
+            redisCacheService.setAdd(key,articleId);
+            Map<String, Object> map = new HashMap<>();
+            map.put("id",UUidUtils.getUUid());
+            map.put("account",dto.getAccount());
+            map.put("articleId",dto.getArticleId());
+            map.put("createTime",new Date());
+            articleMapper.saveArticleRelation(map);
             return new ResultVo(true,200,"收藏成功");
         }else{
-            String str = (String) stringRedisTemplate.opsForHash().get(RedisKeyUtil.MAP_KEY_ART_COLLECT, dto.getAccount());
-            Set<String> articlelSet = str == null ? new HashSet<>() : FastjsonUtil.deserializeToSet(str, String.class);
-            if(null == str || CollectionUtils.isEmpty(articlelSet))
-                return new ResultVo(false,500,"此文章你还为收藏");
-            articlelSet.remove(articleId);
-            stringRedisTemplate.opsForHash().put(RedisKeyUtil.MAP_KEY_ART_COLLECT,dto.getAccount(),FastjsonUtil.serialize(articlelSet));
-            stringRedisTemplate.opsForHash().increment(RedisKeyUtil.MAP_KEY_ART_COLLECT_COUNT,dto.getAccount(),-1);
-            return new ResultVo(true,200,"取消收藏成功");
+            if(!isOk){
+                return new ResultVo(false,500,"此文章你还未收藏");
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("account",dto.getAccount());
+            map.put("articleId",dto.getArticleId());
+            articleMapper.deleteArticleRelation(map);
+            redisCacheService.setRemove(key, articleId);
+            return new ResultVo(false,500,"取消收藏成功");
         }
     }
 
@@ -132,27 +163,25 @@ public class ArticleServiceImpl implements IArticleService {
      * @return
      */
     private ResultVo articleLiked(ArticleLikeDto dto) {
-        String key = RedisKeyUtil.getLikedKey(dto.getArticleId(),dto.getAccount());
+        String articleId = dto.getArticleId();
+        String account = dto.getAccount();
         /**
          * 点赞 / 取消点赞
          */
+        Boolean isOk = redisCacheService.isMember(RedisKeyUtil.MAP_KEY_ART_LIKED + articleId, account);
         if(LikedStatusEnum.LIKE.getCode().equals(dto.getLikeStatus())){
-            Object o = stringRedisTemplate.opsForHash().get(RedisKeyUtil.MAP_KEY_ART_LIKED, key);
-            if(null != o ){
-                return new ResultVo(false,500,"你已经点过赞了");
+            if (isOk){
+                 return new ResultVo(true,500,"你已经点过赞了");
             }
-            stringRedisTemplate.opsForHash().put(RedisKeyUtil.MAP_KEY_ART_LIKED,key, LikedStatusEnum.LIKE.getCode());
-            //统计文章的点赞数
-            stringRedisTemplate.opsForHash().increment(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT,dto.getArticleId(),1);
+            redisCacheService.setAdd(RedisKeyUtil.MAP_KEY_ART_LIKED+articleId,account);
+            redisCacheService.mapIncrBy(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT,articleId);
             return new ResultVo(true,200,"点赞成功");
         }else{
-            Object o = stringRedisTemplate.opsForHash().get(RedisKeyUtil.MAP_KEY_ART_LIKED, key);
-            if(null == o ){
-                return new ResultVo(true,200,"你还未点赞");
+            if (!isOk){
+                return new ResultVo(true,500,"你还未点赞");
             }
-            stringRedisTemplate.opsForHash().delete(RedisKeyUtil.MAP_KEY_ART_LIKED,key);
-            //统计文章的点赞数
-            stringRedisTemplate.opsForHash().increment(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT,dto.getArticleId(),-1);
+            redisCacheService.setRemove(RedisKeyUtil.MAP_KEY_ART_LIKED+articleId,account);
+            redisCacheService.mapIncrBy(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT,articleId,-1);
             return new ResultVo(true,200,"取消点赞");
         }
     }

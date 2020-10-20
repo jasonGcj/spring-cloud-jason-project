@@ -40,4 +40,6 @@ public interface IArticleService {
     ResultVo operateArticle(ArticleLikeDto dto);
 
     void asyncArticleRelation(long account,Map<String, Object> map);
+
+    void asyncArticleInfo(Map<String, Object> map);
 }
