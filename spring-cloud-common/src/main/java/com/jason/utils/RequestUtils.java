@@ -13,10 +13,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RequestUtils {
     public static void setUserRequest(HttpServletRequest request){
+        String username = request.getHeader("username");
+        String account = request.getHeader("account");
         UserEntity userEntity = new UserEntity();
-        userEntity.setUserAccount("888888");
-        userEntity.setUserId("123456789");
-        userEntity.setUserName(request.getHeader("username"));
+        userEntity.setUserAccount(account);
+        userEntity.setUserName(username);
         userEntity.setUserPhone("17521124563");
         UserContext.setCurrentUser(userEntity);
     }

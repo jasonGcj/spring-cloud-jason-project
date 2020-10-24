@@ -16,9 +16,6 @@
 		<!--  Mybatis 创建具有延迟加载能力的对象所用到的代理工具，默认JAVASSIST -->
 		<!--<setting name="proxyFactory" value="CGLIB" />-->
 		<!-- STATEMENT级别的缓存，使一级缓存，只针对当前执行的这一statement有效 -->
-		<!--
-                <setting name="localCacheScope" value="STATEMENT"/>
-        -->
 		<setting name="localCacheScope" value="SESSION"/>
 	</settings>
 </configuration>

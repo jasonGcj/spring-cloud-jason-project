@@ -7,7 +7,7 @@ mybatis:
 spring:
   application:
     # zuul 网关服务标识
-    name: zk-user
+    name: spring-cloud-user
   cloud:
     zookeeper:
       ###当前服务注册到zookeeper注册中心
@@ -40,6 +40,22 @@ spring:
     location: com\jason\server\banner.txt
 logging:
   file: /jason/jar/log/user/user.log
+
+ribbon:
+  ReadTimeout: 10000
+  ConnectTimeout: 10000
+
+#日志配置
+logging.level.ROOT: INFO
+logging.level.org.springframework.web: INFO
+logging.level.cn.com.waterelephant: INFO
+logging.level.com.jason.user.mapper: DEBUG
+# 日志路径
+logging.file: /jason/logs/user/${spring.application.name}.log
+# 控制台的日志模式
+logging.pattern.console: '%d{yyyy-MM-dd HH:mm:ss} - [${spring.application.name:},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] - %msg%n'
+# 日志记录模式文件
+logging.pattern.file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] - [${spring.application.name:},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] - %-5level %logger{36} - %msg%n'
 
 
 

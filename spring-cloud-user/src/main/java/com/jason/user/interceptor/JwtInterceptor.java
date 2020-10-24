@@ -5,6 +5,7 @@ import com.jason.consts.RedisConstant;
 import com.jason.user.UserContext;
 import com.jason.utils.CurremtLimitingUtils;
 import com.jason.utils.RequestUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,14 @@ public class JwtInterceptor implements HandlerInterceptor {
         String flag = this.rateOfFlow(ipAddress);
         RequestUtils.setUserRequest(request);
         if("TIME_OUT".equals(flag)){
-             response.sendRedirect("http://localhost:1001/spring-cloud-user/test/error?message="+"TIME_OUT");
+            String localUrl = "http://localhost:1001/spring-cloud-user/test/error?message=" + "TIME_OUT";
+            String serverUrl = "http://jasonblog.cn:1001/spring-cloud-user/test/error?message=" + "TIME_OUT";
+            boolean isOsLinux = SystemUtils.IS_OS_LINUX;
+            if(isOsLinux){
+                response.sendRedirect(serverUrl);
+            }else{
+                response.sendRedirect(localUrl);
+            }
         }
         LOGGER.info(Thread.currentThread()+":"+ JSON.toJSONString(UserContext.getCurrentUser()));
         return true;

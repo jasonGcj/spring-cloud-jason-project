@@ -6,11 +6,12 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
 spring:
   application:
-    name: zk-article
+    name: spring-cloud-article
   cloud:
     zookeeper:
       ###当前服务注册到zookeeper注册中心
       connect-string: 111.231.116.214:2181
+      enabled: true
   redis:
     # Redis数据库索引（默认为0）
     database: 0
@@ -37,6 +38,8 @@ spring:
     url: jdbc:mysql://cdb-kxgs3wua.cd.tencentcdb.com:10117/jasondb?characterEncoding=utf-8&useSSL=false
   banner:
     location: com\jason\server\banner.txt
+  profiles:
+    active: prod
 # ===========================================================================================
 #日志配置
 logging.level.ROOT: INFO
@@ -44,13 +47,19 @@ logging.level.org.springframework.web: INFO
 logging.level.cn.com.waterelephant: INFO
 logging.level.com.jason.article.mapper: DEBUG
 # 日志路径
-logging.path: /jason/admin/logs/backup
-logging.file: /jason/admin/logs/wenewrs/${spring.application.name}.log
+logging.file: /jason/logs/article/${spring.application.name}.log
 # 控制台的日志模式
 logging.pattern.console: '%d{yyyy-MM-dd HH:mm:ss} - [${spring.application.name:},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] - %msg%n'
 # 日志记录模式文件
 logging.pattern.file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] - [${spring.application.name:},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] - %-5level %logger{36} - %msg%n'
 
 
+jason.weather.url: http://www.tianqiapi.com/api
+jason.weather.appid: 41534383
+jason.weather.appsecret: 7CqKuFN2
+
+# ribbo 饥饿模式
+#ribbon.eager-load.enabled: true
+#ribbon.eager-load.clients: spring-cloud-article,spring-cloud-user
 
 

@@ -53,7 +53,7 @@
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
                 <!--日志文件保留天数-->
-                <MaxHistory>15</MaxHistory>
+                <MaxHistory>10</MaxHistory>
             </rollingPolicy>
         </appender>
         <root level="INFO">
@@ -61,5 +61,4 @@
             <appender-ref ref="ROLLING-FILE"/>
         </root>
     </springProfile>
-
 </configuration>

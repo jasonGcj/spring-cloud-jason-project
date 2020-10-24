@@ -3,6 +3,7 @@ package com.jason.utils;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpResponse;
@@ -18,7 +19,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @ClassName RestUtils
@@ -29,6 +32,7 @@ import java.util.Map;
 public class RestUtils {
     private static final Logger log = LoggerFactory.getLogger(RestUtils.class);
 
+    @LoadBalanced
     private static RestTemplate restTemplate = new RestTemplate();
 
     // 默认时间五秒，不重试。
@@ -71,6 +75,42 @@ public class RestUtils {
         for (int i = 1; i <= RETRY_COUNT; i++) {
             try {
                 result = restTemplate.getForObject(url, String.class);
+                return result;
+            } catch (RestClientException e) {
+                log.error("-----------开始-----------重试count: " + i);
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * https 请求 GET
+     * @param url           地址
+     * @return String 类型
+     */
+    public static String getHttp(String url,Map map) {
+        StringBuilder sb = new StringBuilder();
+        Set<String> sets = map.keySet();
+        Iterator<String> iterator = sets.iterator();
+        sb.append(url);
+        sb.append("?");
+        while (iterator.hasNext()){
+            String key = iterator.next().toString();
+            String value = map.get(key).toString();
+            sb.append(key);
+            sb.append("=");
+            sb.append(value);
+            if(iterator.hasNext()){
+                sb.append("&");
+            }
+        }
+        log.info("url is :"+sb.toString());
+        RestTemplate restTemplate = simpeClient(sb.toString(), CONNEC_TIMEOUT, READ_TIMEOUT);
+        String result = null; // 返回值类型;
+        for (int i = 1; i <= RETRY_COUNT; i++) {
+            try {
+                result = restTemplate.getForObject(sb.toString(), String.class);
                 return result;
             } catch (RestClientException e) {
                 log.error("-----------开始-----------重试count: " + i);

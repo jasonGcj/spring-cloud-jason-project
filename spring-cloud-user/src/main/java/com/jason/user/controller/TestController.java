@@ -1,13 +1,16 @@
 package com.jason.user.controller;
 
 import com.jason.domain.ResultVo;
+import com.jason.feign.article.WeatherApi;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -20,6 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestController.class);
+
+    @Autowired
+    private WeatherApi weatherApi;
 
     @RequestMapping("/hello")
     public String hello(){
@@ -53,7 +59,14 @@ public class TestController {
         return null;
     }
 
-
-
-
+    /**
+     * 错误信息
+     * @param
+     * @return
+     */
+    @RequestMapping("/testWeather")
+    public ResultVo testweather(@RequestBody Map<String,Object> map) {
+        map.put("version","v6");
+        return weatherApi.getWeather(map);
+    }
 }

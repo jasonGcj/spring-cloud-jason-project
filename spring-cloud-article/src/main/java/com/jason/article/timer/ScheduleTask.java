@@ -27,7 +27,7 @@ import java.util.Set;
  * @Date 2020/10/15 12:34
  */
 @Component
-//@EnableScheduling
+@EnableScheduling
 public class ScheduleTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleTask.class);
@@ -40,7 +40,7 @@ public class ScheduleTask {
     /**
      * 定时任务异步刷新 每小时
      */
-    @Scheduled(cron = "0 */1  *  *  * ?")
+    //@Scheduled(cron = "0 */60  *  *  * ?")
     public void asyncArticleRelation(){
         LOGGER.info("文章收藏定时任务开始执行刷新redis内容到mysql");
         long start = System.currentTimeMillis();
@@ -72,10 +72,10 @@ public class ScheduleTask {
     /**
      * 定时任务异步刷新 每小时
      */
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 0 * * * ?")
     public void asyncArticleInfo(){
         LOGGER.info("文章点赞数任务开始执行刷新redis内容到mysql");
-        long start = System.currentTimeMillis();
+        long start1 = System.currentTimeMillis();
         Map<Object, Object> redisMap = redisCacheService.opsHash().entries(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT);
         if(!CollectionUtils.isEmpty(redisMap)){
             for (Map.Entry<Object, Object> entry : redisMap.entrySet()) {
@@ -95,9 +95,12 @@ public class ScheduleTask {
                 }
             }
         }
-        long end = System.currentTimeMillis();
-        LOGGER.info("文章浏览定时任务结束,用时->{}毫秒",(end - start));
+        long end1 = System.currentTimeMillis();
 
+        LOGGER.info("文章点赞数定时任务结束,用时->{}毫秒",(end1 - start1));
+
+        long start2 = System.currentTimeMillis();
+        LOGGER.info("文章浏览数任务开始执行刷新redis内容到mysql");
         Map<Object, Object> redisMap2 = redisCacheService.opsHash().entries(RedisKeyUtil.ARTICLE_COUNT);
         if(!CollectionUtils.isEmpty(redisMap2)){
             for (Map.Entry<Object, Object> entry : redisMap2.entrySet()) {
@@ -117,5 +120,7 @@ public class ScheduleTask {
                 }
             }
         }
+        long end2 = System.currentTimeMillis();
+        LOGGER.info("文章浏览定时任务结束,用时->{}毫秒",(end2 - start2));
     }
 }

@@ -22,10 +22,10 @@ public class ExceptionController {
     // 专门用来捕获和处理Controller层的运行时异常
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ResultVo> runtimeExceptionHandler(RuntimeException e){
-            /*StringWriter sw = new StringWriter();
+            StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw, true));
             String str = sw.toString();
-            System.out.println(str);*/
+            System.out.println(str);
             ResultVo result = new ResultVo();
             result.setOk(false);
             result.setCode(500);
@@ -36,6 +36,10 @@ public class ExceptionController {
     // 专门用来捕获和处理Controller层的异常
     @ExceptionHandler(Exception.class)
     public ResponseEntity exceptionHandler(Exception e){
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw, true));
+        String str = sw.toString();
+        System.out.println(str);
         ResultVo result = new ResultVo();
         result.setOk(false);
         result.setCode(500);
