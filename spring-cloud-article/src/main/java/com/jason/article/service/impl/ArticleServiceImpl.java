@@ -46,9 +46,20 @@ public class ArticleServiceImpl implements IArticleService {
     private RedisCacheService redisCacheService;
 
     @Override
-    public ResultVo queryArticle() {
-        List<ArticleEntity> list = articleMapper.queryArticle();
-        return new ResultVo(true,200,"查询成功",list);
+    public ResultVo queryArticle(ArticleDto dto) {
+        if(0==dto.getStart()){
+            dto.setStart(1);
+        }
+        //设置分页读取记录开始位置
+        dto.setStart((dto.getStart() - 1) * dto.getLimit());
+        //设置分页最大数
+        dto.setLimit(dto.getLimit() == 0 ? 10 : dto.getLimit());
+        int count = articleMapper.queryArticleCount(dto);
+        List<ArticleEntity> list = null;
+        if(count>0){
+             list = articleMapper.queryArticle(dto);
+        }
+        return new ResultVo(true,200,"查询成功",count,list);
 
 
     }
@@ -116,6 +127,17 @@ public class ArticleServiceImpl implements IArticleService {
     @Transactional(rollbackFor = Exception.class)
     public void asyncArticleInfo(Map<String, Object> map) {
         articleMapper.updateArticleInfo(map);
+    }
+
+    @Override
+    public ResultVo showArticle(String flag) {
+        List<ArticleEntity> list = null;
+        if("LIKED_COUNT".equals(flag)){
+             list = articleMapper.showArticleLikedCount();
+        }else if("BROWSE_COUNT".equals(flag)){
+             list = articleMapper.showArticleBrowseCount();
+        }
+        return new ResultVo(true,200,"查询成功",list);
     }
 
     /**

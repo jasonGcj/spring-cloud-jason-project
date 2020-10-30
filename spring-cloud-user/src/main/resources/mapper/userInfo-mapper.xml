@@ -5,24 +5,24 @@
 
         <insert id="registerUser" parameterType="com.jason.user.domain.UserInfoDto">
          INSERT INTO t_bas_user (id,account,username,password,phone_number,create_time,modify_time,active)
-         VALUES (#{id},#{account},#{userName},#{passWord},#{phoneNumber},#{createTime},#{modifyTime},#{active})
+         VALUES (#{id},#{account},#{username},#{password},#{phoneNumber},#{createTime},#{modifyTime},#{active})
         </insert>
 
         <select id="checkUserName" resultType="string">
-            SELECT username as userName FROM t_bas_user WHERE username = #{userName} and active = 'Y' LIMIT 1
+            SELECT username as username FROM t_bas_user WHERE username = #{username} and active = 'Y' LIMIT 1
         </select>
 
         <select id="checkUserPwd" resultType="com.jason.user.domain.UserInfoDto"
                 parameterType="com.jason.user.domain.UserInfoDto">
              SELECT
              id as id,
-             username as userName,
-             password as passWord,
+             username as username,
+             password as password,
              account as account
              FROM t_bas_user
              WHERE
-             username = #{userName}
-             and password = #{passWord}
+             username = #{username}
+             and password = #{password}
              and active = 'Y' LIMIT 1
         </select>
 
@@ -31,7 +31,7 @@
         </select>
 
         <select id="updatePwd" parameterType="com.jason.user.domain.UserInfoDto">
-            update t_bas_user set password = #{passWord} where id = #{id}
+            update t_bas_user set password = #{password} where id = #{id}
         </select>
 
         <select id="checkUserAccount" parameterType="long" resultType="int">

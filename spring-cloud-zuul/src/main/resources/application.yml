@@ -2,7 +2,7 @@ server:
   port: 9999
 spring:
   application:
-    name: zk-geteway
+    name: spring-cloud-zuul
   cloud:
     zookeeper:
       ###当前服务注册到zookeeper注册中心
@@ -40,7 +40,8 @@ zuul:
       path: /spring-cloud-user/**
       #这里一定要是你Eureka注册中心的服务的名称，是所以这里配置serviceId因为跟eureka结合了，如果单独使用zuul,那么就必须写自己机器的IP了，
       #如url:http://localhost:8080/  这样的不好就是写死IP了，万一这IP挂了，这高可用性，服务注册那套东西就用不起来了
-      serviceId: spring-cloud-user
+      #serviceId: spring-cloud-user
+      url: http://${config.host:127.0.0.1}:${config.port:1001}
     spring-cloud-article:
       #开启匹配前缀
       stripPrefix: false
@@ -49,8 +50,8 @@ zuul:
       #服务映射的路径，通过这路径就可以从外部访问你的服务了，目的是为了不爆露你机器的IP，面向服务的路由了，给你选一个可用的出来，
       path: /spring-cloud-article/**
       #这里一定要是你Eureka注册中心的服务的名称，是所以这里配置serviceId因为跟eureka结合了，如果单独使用zuul,那么就必须写自己机器的IP了，
-      #如url:http://localhost:8080/  这样的不好就是写死IP了，万一这IP挂了，这高可用性，服务注册那套东西就用不起来了
-      serviceId: spring-cloud-article
+      url: http://${config.host:127.0.0.1}:${config.port:1003}
+      #serviceId: spring-cloud-article
 
 #日志配置
 logging.level.ROOT: INFO

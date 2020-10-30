@@ -17,7 +17,7 @@ public interface IArticleService {
      * 获取所有文章列表
      * @return
      */
-    ResultVo queryArticle();
+    ResultVo queryArticle(ArticleDto dto);
 
     /**
      * 获取某个文章
@@ -42,4 +42,6 @@ public interface IArticleService {
     void asyncArticleRelation(long account,Map<String, Object> map);
 
     void asyncArticleInfo(Map<String, Object> map);
+
+    ResultVo showArticle(String flag);
 }

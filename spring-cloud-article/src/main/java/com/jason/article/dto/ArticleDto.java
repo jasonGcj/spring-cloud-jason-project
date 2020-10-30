@@ -1,5 +1,7 @@
 package com.jason.article.dto;
 
+import com.jason.domain.CommonEntity;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -9,7 +11,7 @@ import java.util.Date;
  * @Author GCJ
  * @Date 2019/12/2 11:22
  */
-public class ArticleDto implements Serializable {
+public class ArticleDto extends CommonEntity implements Serializable {
     /**
      * 主键
      */

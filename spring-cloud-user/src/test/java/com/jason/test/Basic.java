@@ -1,9 +1,9 @@
 package com.jason.test;
 
-import cn.edu.hfut.dmic.webcollector.example.DemoAutoNewsCrawler;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.rocks.BreadthCrawler;
+import org.junit.Test;
 
 /**
  * @ClassName Basic
@@ -92,5 +92,7 @@ public class Basic extends BreadthCrawler {
          */
         crawler.start(4);
     }
+
+
 
 }

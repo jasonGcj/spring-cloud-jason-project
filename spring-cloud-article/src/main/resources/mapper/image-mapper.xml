@@ -3,8 +3,8 @@
 
 <mapper namespace="com.jason.article.mapper.ImageMapper">
 
-    <select id="queryIndexImage" resultType="map">
-    select  id,image_type as type,post_title,post_medium_image from t_bas_image order by image_sort asc limit 5
+    <select id="queryIndexImage" resultType="com.jason.article.domain.HotImageEntity">
+    select  id,image_type as type,post_title,post_medium_image,article_id as articleId from t_bas_hot_image order by image_sort asc limit 5
     </select>
 
 </mapper>

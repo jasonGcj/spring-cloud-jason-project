@@ -10,21 +10,29 @@
         <result column="link" jdbcType="VARCHAR" property="link" />
         <result column="author" jdbcType="VARCHAR" property="author" />
         <result column="excerpt" jdbcType="VARCHAR" property="excerpt" />
-        <result column="like_count" jdbcType="INTEGER" property="likeCount" />
         <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
         <result column="post_date" jdbcType="TIMESTAMP" property="postDate" />
         <result column="pageviews" jdbcType="INTEGER" property="pageviews" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="create_user_acount" jdbcType="TIMESTAMP" property="createUserAcount" />
+        <result column="liked_count" jdbcType="INTEGER" property="likedCount" />
+        <result column="browse_count" jdbcType="INTEGER" property="browseCount" />
     </resultMap>
     <sql id="Base_Column_List">
-    id, title, post_medium_image, link, author, excerpt, like_count, category_name, post_date,
-    pageviews, create_time, create_user_acount
+    id, title, post_medium_image, link, author, excerpt, category_name, post_date,
+    pageviews, create_time, create_user_acount,liked_count,browse_count
   </sql>
-    <select id="queryArticle" resultMap="BaseResultMap">
+
+    <select id="queryArticleCount" parameterType="com.jason.article.dto.ArticleDto" resultType="int">
+        select
+            count(*)
+            from t_bas_article_info
+    </select>
+    <select id="queryArticle" parameterType="com.jason.article.dto.ArticleDto" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from t_bas_article_info
+        limit #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
     </select>
 
     <select id="queryArticleById" resultMap="BaseResultMap">
@@ -78,6 +86,18 @@
         where account = #{account,jdbcType=BIGINT}
         and   article_id = #{articleId,jdbcType=VARCHAR}
     </delete>
+
+    <select id="showArticleLikedCount" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_bas_article_info ORDER BY liked_count desc limit 10
+    </select>
+
+    <select id="showArticleBrowseCount" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_bas_article_info ORDER BY browse_count desc limit 10
+    </select>
 
 
 </mapper>

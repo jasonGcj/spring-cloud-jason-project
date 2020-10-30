@@ -12,22 +12,98 @@ import java.util.Date;
 public class UserInfoDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    /**
+     * id
+     */
     private String id;
-
-    private String userName;
-
-    private String passWord;
-
+    /**
+     * 用户名
+     */
+    private String username;
+    /**
+     * 密码
+     */
+    private String password;
+    /**
+     * 手机号
+     */
     private String phoneNumber;
-
+    /**
+     * 账号
+     */
     private long account;
-
+    /**
+     * 创建时间
+     */
     private Date createTime;
-
+    /**
+     * 修改时间
+     */
     private Date modifyTime;
-
+    /**
+     * 是否有效
+     */
     private String active;
+    /**
+     * token
+     */
+    private String token;
+    /**
+     * 旧密码
+     */
+    private String oldPwd;
+    /**
+     * 新密码
+     */
+    private String newPwd;
+    /**
+     * 确认密码
+     */
+    private String rePwd;
+    /**
+     * 电子邮箱
+     */
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getOldPwd() {
+        return oldPwd;
+    }
+
+    public void setOldPwd(String oldPwd) {
+        this.oldPwd = oldPwd;
+    }
+
+    public String getNewPwd() {
+        return newPwd;
+    }
+
+    public void setNewPwd(String newPwd) {
+        this.newPwd = newPwd;
+    }
+
+    public String getRePwd() {
+        return rePwd;
+    }
+
+    public void setRePwd(String rePwd) {
+        this.rePwd = rePwd;
+    }
 
     public String getActive() {
         return active;
@@ -35,22 +111,6 @@ public class UserInfoDto implements Serializable {
 
     public void setActive(String active) {
         this.active = active;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
     }
 
     public String getPhoneNumber() {
@@ -91,5 +151,21 @@ public class UserInfoDto implements Serializable {
 
     public void setAccount(long account) {
         this.account = account;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

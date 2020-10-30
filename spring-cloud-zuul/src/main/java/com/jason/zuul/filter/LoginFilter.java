@@ -35,9 +35,9 @@ public class LoginFilter extends ZuulFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginFilter.class);
 
-    public static final String USER_URL ="/spring-cloud-user/user";
+    public static final String ARTICLE_URL ="/spring-cloud-article/article/saveArticleInfo";
 
-    public static final String ARTICLE_URL ="/spring-cloud-article/image";
+    public static final String OPERATE_URL ="/spring-cloud-article/article/operateArticle";
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -69,10 +69,9 @@ public class LoginFilter extends ZuulFilter {
         RequestContext requestContext = RequestContext.getCurrentContext();
         HttpServletRequest request = requestContext.getRequest();
         /**
-         * 这些url不会验证登录规则
+         * 这些url会验证登录规则
          */
-        if(request.getRequestURI().contains(USER_URL) || request.getRequestURI().contains(ARTICLE_URL)
-        ){
+        if(!request.getRequestURI().contains(ARTICLE_URL)||request.getRequestURI().contains(OPERATE_URL)){
             return false;
         }
         return true;

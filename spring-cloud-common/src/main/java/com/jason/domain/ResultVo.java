@@ -28,7 +28,6 @@ public class ResultVo implements Serializable {
     }
 
     public ResultVo(boolean ok,int code,String message,Object data){
-        ResultVo resultVo = new ResultVo();
         this.ok = ok;
         this.code = code;
         this.message = message;
@@ -37,7 +36,6 @@ public class ResultVo implements Serializable {
     }
 
     public ResultVo(boolean ok,int code,String message,int total,Object data){
-        ResultVo resultVo = new ResultVo();
         this.ok = ok;
         this.code = code;
         this.message = message;

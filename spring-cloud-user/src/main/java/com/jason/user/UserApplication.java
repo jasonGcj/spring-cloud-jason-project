@@ -1,5 +1,6 @@
 package com.jason.user;
 
+import com.jason.service.RedisCacheService;
 import com.netflix.loadbalancer.IRule;
 import com.netflix.loadbalancer.RoundRobinRule;
 import org.springframework.boot.SpringApplication;
@@ -32,9 +33,8 @@ public class UserApplication {
     }
 
     @Bean
-    public IRule iRule(){
-//        return new RandomRule();//随机策略
-        return new RoundRobinRule();//轮询策略
+    public RedisCacheService getRedisCacheService(){
+        return new RedisCacheService();
     }
 
 }

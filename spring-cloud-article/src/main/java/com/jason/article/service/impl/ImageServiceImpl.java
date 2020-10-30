@@ -66,7 +66,7 @@ public class ImageServiceImpl implements IImageService {
     }
 
     /**
-     * 取出数据放入数据
+     * 取出数据放入缓存
      * @return
      */
     private List<Map<String, String>> operateReids(){

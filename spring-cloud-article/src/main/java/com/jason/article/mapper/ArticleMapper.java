@@ -19,7 +19,9 @@ import java.util.Map;
  */
 @Mapper
 public interface ArticleMapper {
-    List<ArticleEntity> queryArticle();
+    int queryArticleCount(ArticleDto dto);
+
+    List<ArticleEntity> queryArticle(ArticleDto dto);
 
     ArticleEntity queryArticleById(@Param("id") String id);
 
@@ -34,4 +36,8 @@ public interface ArticleMapper {
     void updateArticleInfo(Map<String, Object> map);
 
     void deleteArticleRelation(Map<String, Object> map);
+
+    List<ArticleEntity> showArticleBrowseCount();
+
+    List<ArticleEntity> showArticleLikedCount();
 }

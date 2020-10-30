@@ -27,9 +27,9 @@ public class ArticleController {
     private IArticleService articleService;
 
     @ApiOperation("获取所有文章列表")
-    @GetMapping("/queryArticle")
-    public ResultVo queryArticle(){
-        return articleService.queryArticle();
+    @PostMapping("/queryArticle")
+    public ResultVo queryArticle(@RequestBody ArticleDto dto){
+        return articleService.queryArticle(dto);
     }
 
     @ApiOperation("获取某个文章")
@@ -55,6 +55,5 @@ public class ArticleController {
     public ResultVo operateArticle(@RequestBody ArticleLikeDto dto){
         return articleService.operateArticle(dto);
     }
-
 
 }

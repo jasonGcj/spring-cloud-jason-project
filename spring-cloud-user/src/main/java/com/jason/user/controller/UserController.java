@@ -41,6 +41,15 @@ public class UserController {
     public ResultVo loginUser(@RequestBody UserInfoDto userInfo) throws Exception {
         return userService.loginUser(userInfo);
     }
+    /**
+     * 退出登录
+     * @param map
+     * @return
+     */
+    @RequestMapping("/loginout")
+    public ResultVo userLogout(@RequestBody Map<String,String> map) throws Exception {
+        return userService.userLogout(map);
+    }
 
     /**
      * 验证用户名的唯一性

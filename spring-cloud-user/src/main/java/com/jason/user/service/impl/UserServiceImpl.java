@@ -6,6 +6,7 @@ import com.jason.consts.JasonConstant;
 import com.jason.consts.RedisConstant;
 import com.jason.domain.ResultVo;
 import com.jason.message.ZxHttpUtil;
+import com.jason.service.RedisCacheService;
 import com.jason.user.domain.UserInfoDto;
 import com.jason.user.domain.UserInfoEntity;
 import com.jason.user.mapper.UserMapper;
@@ -41,6 +42,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    private RedisCacheService redisCacheService;
+
     private static final String USER = "USER_";
 
     /**
@@ -51,8 +55,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResultVo registerUser(UserInfoDto userInfoDto) {
         ResultVo result = new ResultVo();
-        String userName = userInfoDto.getUserName();
-        String passWord = userInfoDto.getPassWord();
+        String userName = userInfoDto.getUsername();
+        String passWord = userInfoDto.getPassword();
         if(StringUtils.isBlank(userName) && StringUtils.isBlank(passWord)){
             result.setMessage("用户名或密码为空");
             return result;
@@ -76,7 +80,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             String user = userMapper.checkUserName(userName);
-            if(userInfoDto.getUserName().equals(user)){
+            if(userInfoDto.getUsername().equals(user)){
                 result.setMessage("用户名已存在");
                 LOGGER.info("用户名已存在:"+user);
                 return result;
@@ -101,7 +105,7 @@ public class UserServiceImpl implements UserService {
             userInfoDto.setCreateTime(new Date());
             userInfoDto.setModifyTime(userInfoDto.getCreateTime());
             //MD5加密
-            userInfoDto.setPassWord(Md5Util.md5password(passWord));
+            userInfoDto.setPassword(Md5Util.md5password(passWord));
             userInfoDto.setActive(JasonConstant.STR_Y);
             userMapper.registerUser(userInfoDto);
         } catch (Exception e) {
@@ -125,12 +129,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResultVo checkUserName(Map<String, String> map) {
         ResultVo result = new ResultVo();
-        String userName = map.get("userName");
-        if(StringUtils.isBlank(userName)){
+        String username = map.get("username");
+        if(StringUtils.isBlank(username)){
             LOGGER.info("用户输入的信息为空或空格");
         }
         try {
-            String user = userMapper.checkUserName(userName);
+            String user = userMapper.checkUserName(username);
             result.setCode(200);
             result.setOk(true);
             result.setData(user);
@@ -152,11 +156,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ResultVo loginUser(UserInfoDto userInfo) {
-        LOGGER.info("user is login:{}",JSON.toJSONString(userInfo.getUserName()));
+        LOGGER.info("user is login:{}",JSON.toJSONString(userInfo.getUsername()));
         ResultVo result = new ResultVo();
-        String userName = userInfo.getUserName();
-        String passWord = userInfo.getPassWord();
-        if(StringUtils.isBlank(userName) && StringUtils.isBlank(passWord)){
+        String username = userInfo.getUsername();
+        String password = userInfo.getPassword();
+        if(StringUtils.isBlank(username) && StringUtils.isBlank(password)){
             result.setMessage("用户名或密码为空");
             return result;
         }
@@ -169,28 +173,28 @@ public class UserServiceImpl implements UserService {
             result.setMessage("用户名或密码长度不够");
             return result;
         }
-        userInfo.setPassWord(Md5Util.md5password(passWord));
+        userInfo.setPassword(Md5Util.md5password(password));
         UserInfoDto userResult = userMapper.checkUserPwd(userInfo);
         if(null != userResult){
-            if(StringUtils.isNotBlank(userResult.getPassWord())){
+            if(StringUtils.isNotBlank(userResult.getPassword())){
                 Map<String, Object> map = new HashMap<>();
-                map.put("userName",userResult.getUserName());
-                map.put("passWord",userResult.getPassWord());
+                map.put("username",userResult.getUsername());
+                map.put("password",userResult.getPassword());
                 String token ="";
                 //1.大key  2.小key 3.Token 编码
-                if(!stringRedisTemplate.hasKey(RedisConstant.LOGIN+userName)){
+                if(!stringRedisTemplate.hasKey(RedisConstant.LOGIN+username)){
                     //生成Token
                     token = JwtUtil.createToken(map);
-                    stringRedisTemplate.opsForValue().set(RedisConstant.LOGIN+userName,token);
-                    stringRedisTemplate.expire(RedisConstant.LOGIN+userName,1, TimeUnit.DAYS);
+                    stringRedisTemplate.opsForValue().set(RedisConstant.LOGIN+username,token);
+                    stringRedisTemplate.expire(RedisConstant.LOGIN+username,1, TimeUnit.DAYS);
                 }else{
-                    token = stringRedisTemplate.opsForValue().get(RedisConstant.LOGIN+userName);
+                    token = stringRedisTemplate.opsForValue().get(RedisConstant.LOGIN+username);
                 }
                 LOGGER.info("token:"+token);
                 UserInfoEntity user = new UserInfoEntity();
                 user.setToken(token);
                 user.setAccount(userResult.getAccount());
-                user.setUsername(userResult.getUserName());
+                user.setUsername(userResult.getUsername());
                 result.setMessage("验证成功");
                 result.setData(user);
                 result.setCode(200);
@@ -280,43 +284,53 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ResultVo updatePwd(Map<String, String> map) {
-        ResultVo result = new ResultVo();
-        String userName = map.get("userName");//用户名
+        String username = map.get("username");//用户名
         String oldPwd = map.get("oldPwd");//老密码
         String newPwd = map.get("newPwd");//新密码
-        String reNewPwd = map.get("reNewPwd");//确认密码
-        if(StringUtils.isBlank(userName) && StringUtils.isBlank(oldPwd) &&
-                StringUtils.isBlank(newPwd) && StringUtils.isBlank(reNewPwd)){
+        String rePwd = map.get("rePwd");//确认密码
+        if(StringUtils.isBlank(username) && StringUtils.isBlank(oldPwd) &&
+                StringUtils.isBlank(newPwd) && StringUtils.isBlank(rePwd)){
             LOGGER.info("用户名或密码为null");
-            result.setMessage("用户名或密码为null");
+            return new ResultVo(false,500,"用户名或密码为null");
         }
 
-        if(!newPwd.equals(reNewPwd)){
+        if(!newPwd.equals(rePwd)){
             LOGGER.info("新密码和旧密码不一样...");
-            result.setMessage("新密码和旧密码不一样...");
+            return new ResultVo(false,500,"新密码和确认密码不一致");
         }
 
         UserInfoDto userInfoDto = new UserInfoDto();
-        userInfoDto.setPassWord(Md5Util.md5password(oldPwd));
-        userInfoDto.setUserName(userName);
+        userInfoDto.setPassword(Md5Util.md5password(oldPwd));
+        userInfoDto.setUsername(username);
         try {
             UserInfoDto userResult = userMapper.checkUserPwd(userInfoDto);
             if(null != userResult){
-               if(StringUtils.isNotBlank(userResult.getPassWord())){
-                   userInfoDto.setPassWord(Md5Util.md5password(newPwd));
-                   userInfoDto.setId(userResult.getId());
-                   userMapper.updatePwd(userInfoDto);
-               }
+                userInfoDto.setPassword(Md5Util.md5password(newPwd));
+                userInfoDto.setId(userResult.getId());
+                userMapper.updatePwd(userInfoDto);
+                return new ResultVo(true,200,"用户:"+username+"密码修改成功");
             }
+            return new ResultVo(false,500,"旧密码不对");
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.error("密码修改失败:"+e.getMessage());
-            result.setMessage("密码修改失败");
+            return new ResultVo(false,500,"密码修改失败");
         }
-        result.setMessage("用户:"+userName+"密码修改成功");
-        result.setCode(200);
-        result.setOk(true);
-        return result;
+    }
+
+    @Override
+    public ResultVo userLogout(Map<String, String> map) {
+        if(null == map || StringUtils.isBlank(map.get("username"))){
+            return new ResultVo(false,500,"未获取到登陆信息");
+        }
+        String username = map.get("username");
+        String token = map.get("token");
+        if(token.equals(redisCacheService.get(RedisConstant.LOGIN + username))){
+            redisCacheService.del(RedisConstant.LOGIN + username);
+            LOGGER.info("user :"+username+" is logout");
+            return new ResultVo(true,200,"退出登录");
+        }
+        return new ResultVo(false,500,"未获取到登陆信息");
     }
 
     /**
@@ -325,8 +339,8 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public boolean checkUserAndPwdLength(UserInfoDto userInfoDto){
-        int pwdlength = userInfoDto.getPassWord().length();
-        int userlength = userInfoDto.getUserName().length();
+        int pwdlength = userInfoDto.getPassword().length();
+        int userlength = userInfoDto.getUsername().length();
         if(pwdlength >= 8 && pwdlength <=16 && userlength>=6 && userlength<=16){
             return true;
         }

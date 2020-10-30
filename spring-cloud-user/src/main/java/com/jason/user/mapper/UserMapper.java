@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMapper {
     void registerUser(UserInfoDto userInfoDto);
 
-    String checkUserName(@Param("userName") String userName);
+    String checkUserName(@Param("username") String username);
 
     UserInfoDto checkUserPwd(UserInfoDto userInfo);
 

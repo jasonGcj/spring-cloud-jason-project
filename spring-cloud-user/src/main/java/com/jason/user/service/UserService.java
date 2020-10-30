@@ -37,4 +37,6 @@ public interface UserService {
     ResultVo sendCode(Map<String, String> map);
 
     ResultVo updatePwd(Map<String, String> map);
+
+    ResultVo userLogout(Map<String, String> map);
 }
