@@ -1,6 +1,7 @@
 package com.jason.user.service;
 
 import com.jason.domain.ResultVo;
+import com.jason.user.domain.EmailDto;
 import com.jason.user.domain.UserInfoDto;
 
 import java.util.Map;
@@ -39,4 +40,6 @@ public interface UserService {
     ResultVo updatePwd(Map<String, String> map);
 
     ResultVo userLogout(Map<String, String> map);
+
+    ResultVo sendEmail(EmailDto dto);
 }

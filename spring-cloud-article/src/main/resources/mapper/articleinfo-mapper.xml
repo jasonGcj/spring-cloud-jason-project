@@ -27,11 +27,17 @@
         select
             count(*)
             from t_bas_article_info
+            <if test="keywords!=null and keywords!=''">
+            where title like concat(#{keywords,jdbcType=VARCHAR},'%')
+            </if>
     </select>
     <select id="queryArticle" parameterType="com.jason.article.dto.ArticleDto" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from t_bas_article_info
+        <if test="keywords!=null and keywords!=''">
+        where title like concat(#{keywords,jdbcType=VARCHAR},'%')
+        </if>
         limit #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
     </select>
 

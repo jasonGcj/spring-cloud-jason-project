@@ -7,10 +7,13 @@ import com.jason.consts.RedisConstant;
 import com.jason.domain.ResultVo;
 import com.jason.message.ZxHttpUtil;
 import com.jason.service.RedisCacheService;
+import com.jason.user.domain.EmailDto;
 import com.jason.user.domain.UserInfoDto;
 import com.jason.user.domain.UserInfoEntity;
 import com.jason.user.mapper.UserMapper;
 import com.jason.user.service.UserService;
+import com.jason.utils.EmailUtils;
+import com.jason.utils.JasonUtils;
 import com.jason.utils.JwtUtil;
 import com.jason.utils.Md5Util;
 import org.apache.commons.lang.StringUtils;
@@ -245,7 +248,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResultVo sendCode(Map<String, String> map) {
         ResultVo result = new ResultVo();
-        String phone = (String) map.get("phoneNumber");
+        String phone = map.get("phoneNumber");
         if(StringUtils.isBlank(phone)){
             result.setMessage("用户输入的手机号为空或空格");
         }
@@ -333,6 +336,17 @@ public class UserServiceImpl implements UserService {
         return new ResultVo(false,500,"未获取到登陆信息");
     }
 
+    @Override
+    public ResultVo sendEmail(EmailDto dto) {
+        dto.setEmailCode(JasonUtils.randomNumber(6));
+        ResultVo result = EmailUtils.sendEmail(dto.getEmailAddress(), dto.getEmailCode());
+        if(result.isOk()){
+            String key = RedisConstant.EMAIL + dto.getEmailAddress();
+            redisCacheService.set(key,dto.getEmailCode());
+        }
+        return result;
+    }
+
     /**
      * 验证字符串密码长度
      * @param userInfoDto
@@ -341,10 +355,7 @@ public class UserServiceImpl implements UserService {
     public boolean checkUserAndPwdLength(UserInfoDto userInfoDto){
         int pwdlength = userInfoDto.getPassword().length();
         int userlength = userInfoDto.getUsername().length();
-        if(pwdlength >= 8 && pwdlength <=16 && userlength>=6 && userlength<=16){
-            return true;
-        }
-        return false;
+        return pwdlength >= 8 && pwdlength <= 16 && userlength >= 6 && userlength <= 16;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.jason.user.controller;
 
 import com.jason.domain.ResultVo;
+import com.jason.user.domain.EmailDto;
 import com.jason.user.domain.UserInfoDto;
 import com.jason.user.service.UserService;
 import org.apache.commons.lang.StringUtils;
@@ -89,6 +90,11 @@ public class UserController {
     @RequestMapping("/updatePwd")
     public ResultVo updatePwd(@RequestBody Map<String,String> map){
         return userService.updatePwd(map);
+    }
+
+    @RequestMapping("/sendEmail")
+    public ResultVo sendEmail(@RequestBody EmailDto dto){
+        return userService.sendEmail(dto);
     }
 
 }

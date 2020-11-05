@@ -13,6 +13,8 @@ public class CommonEntity implements Serializable {
 
     private int limit;
 
+    private String keywords;
+
     public int getStart() {
         return start;
     }
@@ -27,5 +29,13 @@ public class CommonEntity implements Serializable {
 
     public void setLimit(int limit) {
         this.limit = limit;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 }

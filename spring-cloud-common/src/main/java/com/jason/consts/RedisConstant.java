@@ -16,4 +16,11 @@ public class RedisConstant {
      * 登录
      */
     public static final String LOGIN ="LOGIN:";
+
+    /**
+     * 邮箱
+     */
+    public static final String EMAIL ="EMAIL:";
+
+
 }
