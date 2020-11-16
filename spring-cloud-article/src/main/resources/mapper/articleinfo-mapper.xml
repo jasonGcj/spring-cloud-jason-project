@@ -105,5 +105,11 @@
         from t_bas_article_info ORDER BY browse_count desc limit 10
     </select>
 
+    <select id="showArticleOrderTimeCount" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_bas_article_info ORDER BY create_time desc limit 10
+    </select>
+
 
 </mapper>

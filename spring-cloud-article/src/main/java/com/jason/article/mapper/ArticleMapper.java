@@ -40,4 +40,7 @@ public interface ArticleMapper {
     List<ArticleEntity> showArticleBrowseCount();
 
     List<ArticleEntity> showArticleLikedCount();
+
+    List<ArticleEntity> showArticleOrderTimeCount();
+
 }

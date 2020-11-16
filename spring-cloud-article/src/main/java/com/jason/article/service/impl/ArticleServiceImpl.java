@@ -136,6 +136,8 @@ public class ArticleServiceImpl implements IArticleService {
              list = articleMapper.showArticleLikedCount();
         }else if("BROWSE_COUNT".equals(flag)){
              list = articleMapper.showArticleBrowseCount();
+        }else if("ORDERTIME_COUNT".equals(flag)){
+            list = articleMapper.showArticleOrderTimeCount();
         }
         return new ResultVo(true,200,"查询成功",list);
     }

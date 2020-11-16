@@ -71,6 +71,7 @@ public class LoginFilter extends ZuulFilter {
         /**
          * 这些url会验证登录规则
          */
+        LOGGER.info("request start :"+request.getRequestURI());
         if(!request.getRequestURI().contains(ARTICLE_URL)||request.getRequestURI().contains(OPERATE_URL)){
             return false;
         }
