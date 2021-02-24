@@ -2,6 +2,8 @@ package com.jason.user.controller;
 
 import com.jason.domain.ResultVo;
 import com.jason.feign.article.WeatherApi;
+import com.jason.user.domain.TestQueryDto;
+import com.jason.user.service.TestService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
@@ -26,6 +28,9 @@ public class TestController {
 
     @Autowired
     private WeatherApi weatherApi;
+
+    @Autowired
+    private TestService testService;
 
     @RequestMapping("/hello")
     public String hello(){
@@ -68,5 +73,15 @@ public class TestController {
     public ResultVo testweather(@RequestBody Map<String,Object> map) {
         map.put("version","v6");
         return weatherApi.getWeather(map);
+    }
+
+    @RequestMapping("/testQueryData")
+    public ResultVo testQueryData(@RequestBody TestQueryDto dto){
+        return testService.testQueryData(dto);
+    }
+
+    @RequestMapping("/addData")
+    public ResultVo addData(@RequestBody TestQueryDto dto){
+        return testService.addData(dto);
     }
 }
