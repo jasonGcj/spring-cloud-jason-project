@@ -10,7 +10,7 @@
         <result column="link" jdbcType="VARCHAR" property="link" />
         <result column="author" jdbcType="VARCHAR" property="author" />
         <result column="excerpt" jdbcType="VARCHAR" property="excerpt" />
-        <result column="like_count" jdbcType="INTEGER" property="likeCount" />
+        <result column="like_count" jdbcType="INTEGER" property="likedCount" />
         <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
         <result column="post_date" jdbcType="TIMESTAMP" property="postDate" />
         <result column="pageviews" jdbcType="INTEGER" property="pageviews" />

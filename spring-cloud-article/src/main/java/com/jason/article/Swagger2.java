@@ -34,7 +34,7 @@ public class Swagger2 {
         return new ApiInfoBuilder()
                 .title("JasonGu个人博客RESTful APIs")
                 .description("更多的博客文章请关注我：......")
-                .termsOfServiceUrl("http://blog.didispace.com/")
+                .termsOfServiceUrl("https://jasonblog.cn/")
                 .contact("@难言之隐")
                 .version("1.0")
                 .build();

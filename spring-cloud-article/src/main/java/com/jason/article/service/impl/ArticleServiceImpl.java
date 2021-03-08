@@ -8,6 +8,8 @@ import com.jason.article.service.IArticleService;
 import com.jason.domain.ResultVo;
 import com.jason.enums.LikedStatusEnum;
 import com.jason.service.RedisCacheService;
+import com.jason.user.IUser;
+import com.jason.user.UserContext;
 import com.jason.utils.FastjsonUtil;
 import com.jason.utils.RedisKeyUtil;
 import com.jason.utils.UUidUtils;
@@ -22,8 +24,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
-import static com.jason.utils.RedisKeyUtil.MAP_KEY_ART_LIKED;
-import static com.jason.utils.RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT;
+import static com.jason.utils.RedisKeyUtil.*;
 
 /**
  * @ClassName ArticleServiceImpl
@@ -58,21 +59,58 @@ public class ArticleServiceImpl implements IArticleService {
         List<ArticleEntity> list = null;
         if(count>0){
              list = articleMapper.queryArticle(dto);
+             list.forEach(
+                    u->{
+                        Object o = redisCacheService.mapGet(ARTICLE_COUNT, u.getId());
+                        if(null == o){
+                            u.setBrowseCount(0);
+                        }else{
+                            u.setBrowseCount(Integer.valueOf(o.toString()));
+                        }
+
+                    });
         }
+
         return new ResultVo(true,200,"查询成功",count,list);
 
 
     }
 
+    /**
+     * 查询文章详情
+     * @param id
+     * @return
+     */
     @Override
     public ResultVo queryArticleById(String id) {
         ArticleEntity articleEntity = articleMapper.queryArticleById(id);
         if(null !=articleEntity){
+            IUser currentUser = UserContext.getCurrentUser();
+            //文章浏览量+1
             redisCacheService.mapIncrBy(RedisKeyUtil.ARTICLE_COUNT,id);
+            //文章的点赞数量
+            Object o1 = redisCacheService.mapGet(MAP_KEY_ART_LIKED_COUNT, id);
+            //文章的收藏数量
+            Object o2 = redisCacheService.mapGet(MAP_KEY_ART_COLLECT_COUNT, id);
+            //文章是否被作者点赞过
+            Boolean member = redisCacheService.isMember(MAP_KEY_ART_LIKED + id, "1602227663");
+            if(null !=o1){
+                articleEntity.setLikedCount(Integer.valueOf(o1.toString()));
+            }
+            if(null !=o2){
+                articleEntity.setCollctCount(Integer.valueOf(o2.toString()));
+            }
+            articleEntity.setLiked(member);
+            articleEntity.setCollect(member);
         }
         return new ResultVo(true,200,"查询成功",articleEntity);
     }
 
+    /**
+     * 保存文章信息
+     * @param dto
+     * @return
+     */
     @Override
     public ResultVo saveArticleInfo(ArticleDto dto) {
         dto.setCreateTime(new Date());
@@ -139,6 +177,16 @@ public class ArticleServiceImpl implements IArticleService {
         }else if("ORDERTIME_COUNT".equals(flag)){
             list = articleMapper.showArticleOrderTimeCount();
         }
+        list.forEach(
+                u->{
+                    Object o = redisCacheService.mapGet(ARTICLE_COUNT, u.getId());
+                    if(null == o){
+                        u.setBrowseCount(0);
+                    }else{
+                        u.setBrowseCount(Integer.valueOf(o.toString()));
+                    }
+
+                });
         return new ResultVo(true,200,"查询成功",list);
     }
 
@@ -195,18 +243,20 @@ public class ArticleServiceImpl implements IArticleService {
         Boolean isOk = redisCacheService.isMember(RedisKeyUtil.MAP_KEY_ART_LIKED + articleId, account);
         if(LikedStatusEnum.LIKE.getCode().equals(dto.getLikeStatus())){
             if (isOk){
-                 return new ResultVo(true,500,"你已经点过赞了");
+                 return new ResultVo(false,500,"你已经点过赞了");
             }
+            //点赞的文章
             redisCacheService.setAdd(RedisKeyUtil.MAP_KEY_ART_LIKED+articleId,account);
+            //点赞的数量
             redisCacheService.mapIncrBy(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT,articleId);
             return new ResultVo(true,200,"点赞成功");
         }else{
             if (!isOk){
-                return new ResultVo(true,500,"你还未点赞");
+                return new ResultVo(false,500,"你还未点赞");
             }
             redisCacheService.setRemove(RedisKeyUtil.MAP_KEY_ART_LIKED+articleId,account);
             redisCacheService.mapIncrBy(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT,articleId,-1);
-            return new ResultVo(true,200,"取消点赞");
+            return new ResultVo(false,200,"取消点赞");
         }
     }
 

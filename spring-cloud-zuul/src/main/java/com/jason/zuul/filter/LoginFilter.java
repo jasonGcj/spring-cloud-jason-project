@@ -1,10 +1,7 @@
 package com.jason.zuul.filter;
 
-import com.alibaba.fastjson.JSON;
 import com.jason.consts.LoginStateConstant;
 import com.jason.consts.RedisConstant;
-import com.jason.domain.UserEntity;
-import com.jason.user.IUser;
 import com.jason.user.UserContext;
 import com.jason.utils.CurremtLimitingUtils;
 import com.netflix.zuul.ZuulFilter;

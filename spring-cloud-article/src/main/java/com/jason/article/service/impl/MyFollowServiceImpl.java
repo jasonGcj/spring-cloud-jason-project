@@ -48,12 +48,12 @@ public class MyFollowServiceImpl implements IMyFollowService {
         List<ArticleEntity> list = null;
         try {
             list = myFollowMapper.queryMyFollowInfoByUserId(userId);
-            list.stream().forEach( u->{
+           /* list.stream().forEach( u->{
                 String browseCount = redisCacheService.mapGet(RedisKeyUtil.ARTICLE_COUNT, u.getId()).toString();
                 String likedCount = redisCacheService.mapGet(RedisKeyUtil.MAP_KEY_ART_LIKED_COUNT, u.getId()).toString();
                 u.setBrowseCount(Integer.valueOf(browseCount));
                 u.setLikedCount(Integer.valueOf(likedCount));
-            });
+            });*/
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.error("系统异常，未获取到关注列表"+e.getMessage());

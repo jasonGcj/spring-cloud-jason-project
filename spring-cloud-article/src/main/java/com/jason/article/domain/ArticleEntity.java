@@ -53,7 +53,7 @@ public class ArticleEntity implements Serializable {
     /**
      * 观看次数
      */
-    private Integer pageviews;
+    private int pageviews;
 
     /**
      * 创建时间
@@ -67,11 +67,23 @@ public class ArticleEntity implements Serializable {
     /**
      * 点赞数量
      */
-    private Integer likedCount;
+    private int likedCount;
+    /**
+     * 点赞数量
+     */
+    private int collctCount;
     /**
      * 浏览数量
      */
-    private Integer browseCount;
+    private int browseCount;
+    /**
+     * 作者是否点赞
+     */
+    private boolean isLiked;
+    /**
+     * 作者是否收藏
+     */
+    private boolean isCollect;
 
     private static final long serialVersionUID = 1L;
 
@@ -139,11 +151,11 @@ public class ArticleEntity implements Serializable {
         this.postDate = postDate;
     }
 
-    public Integer getPageviews() {
+    public int getPageviews() {
         return pageviews;
     }
 
-    public void setPageviews(Integer pageviews) {
+    public void setPageviews(int pageviews) {
         this.pageviews = pageviews;
     }
 
@@ -163,19 +175,43 @@ public class ArticleEntity implements Serializable {
         this.createUserAcount = createUserAcount;
     }
 
-    public Integer getLikedCount() {
+    public int getLikedCount() {
         return likedCount;
     }
 
-    public void setLikedCount(Integer likedCount) {
+    public void setLikedCount(int likedCount) {
         this.likedCount = likedCount;
     }
 
-    public Integer getBrowseCount() {
+    public int getCollctCount() {
+        return collctCount;
+    }
+
+    public void setCollctCount(int collctCount) {
+        this.collctCount = collctCount;
+    }
+
+    public int getBrowseCount() {
         return browseCount;
     }
 
-    public void setBrowseCount(Integer browseCount) {
+    public void setBrowseCount(int browseCount) {
         this.browseCount = browseCount;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public boolean isCollect() {
+        return isCollect;
+    }
+
+    public void setCollect(boolean collect) {
+        isCollect = collect;
     }
 }
