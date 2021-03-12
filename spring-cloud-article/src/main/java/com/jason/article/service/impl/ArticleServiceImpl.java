@@ -1,6 +1,7 @@
 package com.jason.article.service.impl;
 
 import com.jason.article.domain.ArticleEntity;
+import com.jason.article.domain.ArticleLIkeEntity;
 import com.jason.article.dto.ArticleDto;
 import com.jason.article.dto.ArticleLikeDto;
 import com.jason.article.mapper.ArticleMapper;
@@ -70,7 +71,6 @@ public class ArticleServiceImpl implements IArticleService {
 
                     });
         }
-
         return new ResultVo(true,200,"查询成功",count,list);
 
 
@@ -82,13 +82,35 @@ public class ArticleServiceImpl implements IArticleService {
      * @return
      */
     @Override
-    public ResultVo queryArticleById(String id) {
+    public ResultVo queryArticleById(String id,String account) {
         ArticleEntity articleEntity = articleMapper.queryArticleById(id);
         if(null !=articleEntity){
             IUser currentUser = UserContext.getCurrentUser();
             //文章浏览量+1
             redisCacheService.mapIncrBy(RedisKeyUtil.ARTICLE_COUNT,id);
-            //文章的点赞数量
+            Object o = redisCacheService.mapGet(ARTICLE_COUNT, id);
+            if(null == o){
+                articleEntity.setBrowseCount(0);
+            }else{
+                articleEntity.setBrowseCount(Integer.valueOf(o.toString()));
+            }
+            ArticleLIkeEntity e1 = articleMapper.queryArticleLikeAndCollectCount(id);
+            if(null != e1){
+                articleEntity.setLikedCount(e1.getLikedCount());
+                articleEntity.setCollctCount(e1.getCollectCount());
+            }
+            if(StringUtils.isNotBlank(account)){
+                Map<String, String> map = new HashMap<>();
+                map.put("articleId",id);
+                map.put("account",account);
+                ArticleLIkeEntity e2 = articleMapper.queryArticleLikeAndCollectInfo(map);
+                if(null != e2){
+                    articleEntity.setLiked(e2.getIsLiked()>0);
+                    articleEntity.setCollect(e2.getIsCollect()>0);
+                }
+            }
+
+           /* //文章的点赞数量
             Object o1 = redisCacheService.mapGet(MAP_KEY_ART_LIKED_COUNT, id);
             //文章的收藏数量
             Object o2 = redisCacheService.mapGet(MAP_KEY_ART_COLLECT_COUNT, id);
@@ -101,7 +123,7 @@ public class ArticleServiceImpl implements IArticleService {
                 articleEntity.setCollctCount(Integer.valueOf(o2.toString()));
             }
             articleEntity.setLiked(member);
-            articleEntity.setCollect(member);
+            articleEntity.setCollect(member);*/
         }
         return new ResultVo(true,200,"查询成功",articleEntity);
     }
@@ -136,15 +158,49 @@ public class ArticleServiceImpl implements IArticleService {
             return new ResultVo(false,500,"用户未登录");
         }
 
-        if(1==dto.getOpeType()){
+        if(dto.getOpeType()!=1 && dto.getOpeType()!=2){
+            return new ResultVo(false,500,"操作类型不对");
+        }
+        //查询关系表数据里是有否 已经点赞 已经 收藏的数据
+        int count = articleMapper.queryArticleRelationCount(dto);
+        if(count > 0){
+            String message = "";
+            Map<String, Object> map = new HashMap<>();
+            map.put("account",dto.getAccount());
+            map.put("articleId",dto.getArticleId());
+            map.put("opeType",dto.getOpeType());
+            articleMapper.deleteArticleRelation(map);
+            return new ResultVo(true,200,"取消成功");
+        }else{
+            Map<String, Object> map = new HashMap<>();
+            map.put("id",UUidUtils.getUUid());
+            map.put("account",dto.getAccount());
+            map.put("articleId",dto.getArticleId());
+            map.put("createTime",new Date());
+            map.put("opeType",dto.getOpeType());
+            articleMapper.saveArticleRelation(map);
+            String message = "";
+            if(dto.getOpeType()==1){
+                message="点赞成功";
+            }else if(dto.getOpeType()==2){
+                message="收藏成功";
+            }
+            return new ResultVo(true,200,message);
+        }
+        /**
+         * 查询文章是否点赞 或者缓存
+         */
+       /* 这些是redis缓存操作 if(1==dto.getOpeType()){
             LOGGER.info("文章开始点赞");
             return articleLiked(dto);
         }else if(2==dto.getOpeType()){
             LOGGER.info("文章开始收藏");
             return articleCollect(dto);
-        }
-        return new ResultVo(false,500,"操作类型不对");
+        }*/
+
     }
+
+
 
     /**
      * 异步刷新个人收藏的文章

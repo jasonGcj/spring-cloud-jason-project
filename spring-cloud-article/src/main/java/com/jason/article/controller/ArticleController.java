@@ -6,6 +6,7 @@ import com.jason.article.service.IArticleService;
 import com.jason.article.service.impl.MyFollowServiceImpl;
 import com.jason.domain.ResultVo;
 import com.jason.user.UserContext;
+import com.netflix.client.http.HttpRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +45,8 @@ public class ArticleController {
     @ApiOperation("获取某个文章")
     @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "String")
     @GetMapping("/querySomeOneArticle")
-    public ResultVo queryArticleById(@PathParam("id") String id ){
-        return articleService.queryArticleById(id);
+    public ResultVo queryArticleById(@PathParam("id") String id ,@PathParam("account") String account){
+        return articleService.queryArticleById(id,account);
     }
 
     @ApiOperation("添加文章")
@@ -74,5 +76,6 @@ public class ArticleController {
         }
         return count+"";
     }
+
 
 }

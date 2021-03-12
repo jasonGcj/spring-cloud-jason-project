@@ -1,8 +1,10 @@
 package com.jason.article.mapper;
 
 import com.jason.article.domain.ArticleEntity;
+import com.jason.article.domain.ArticleLIkeEntity;
 import com.jason.article.dto.ArticleDto;
 import com.jason.article.domain.ArticleVo;
+import com.jason.article.dto.ArticleLikeDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
@@ -43,4 +45,19 @@ public interface ArticleMapper {
 
     List<ArticleEntity> showArticleOrderTimeCount();
 
+    /**
+     * 查询文章关系表
+     * @param dto
+     */
+    int queryArticleRelationCount(ArticleLikeDto dto);
+    /**
+     * 根据文章id 查询文章的 收藏 点赞 详情
+     * @param id
+     */
+    ArticleLIkeEntity queryArticleLikeAndCollectCount(String id);
+    /**
+     * 根据文章id 用户账号 查询文章的 收藏 点赞 详情
+     * @param
+     */
+    ArticleLIkeEntity queryArticleLikeAndCollectInfo(Map<String, String> map);
 }

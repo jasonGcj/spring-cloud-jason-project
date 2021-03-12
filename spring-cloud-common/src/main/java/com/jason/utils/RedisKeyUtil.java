@@ -31,6 +31,11 @@ public class RedisKeyUtil {
     public static final String ARTICLE_COUNT="ARTICLE_COUNT";
 
     /**
+     * 红包标识
+     */
+    public static final String RED_PACKAGE="RED_P:";
+
+    /**
      * 拼接点赞的key
      * @param articlId
      * @param userId

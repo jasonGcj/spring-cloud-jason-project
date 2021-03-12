@@ -78,7 +78,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         if(stringRedisTemplate.hasKey(ipAddress)){
             if( stringRedisTemplate.getExpire(ipAddress)>-1){
                 Long increment = stringRedisTemplate.opsForValue().increment(ipAddress, 1L);
-                if(increment >= 10){
+                if(increment >= 20){
                     /**
                      * 访问受限 加入黑名单...
                      */

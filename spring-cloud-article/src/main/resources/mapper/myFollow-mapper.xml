@@ -31,6 +31,7 @@
         t_bas_article_info t
         where b.article_id = t.id
         AND b.account = #{account,jdbcType=BIGINT}
+        and operate_type = 2
         order by create_time
     </select>
 

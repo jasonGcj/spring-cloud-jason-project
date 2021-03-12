@@ -64,11 +64,11 @@
     </select>
 
     <insert id="saveArticleRelation" parameterType="map">
-        insert into t_bas_article_relation (id,account,article_id,article_count,create_time)
+        insert into t_bas_article_relation (id,account,article_id,article_count,create_time,operate_type)
         values
            (
             #{id,jdbcType=VARCHAR},#{account,jdbcType=BIGINT}, #{articleId,jdbcType=VARCHAR},
-            #{articleCount,jdbcType=BIGINT},#{createTime,jdbcType=TIMESTAMP}
+            #{articleCount,jdbcType=BIGINT},#{createTime,jdbcType=TIMESTAMP},#{opeType,jdbcType=VARCHAR}
             )
     </insert>
 
@@ -90,7 +90,8 @@
     <delete id="deleteArticleRelation" parameterType="map">
         delete from t_bas_article_relation
         where account = #{account,jdbcType=BIGINT}
-        and   article_id = #{articleId,jdbcType=VARCHAR}
+        and  article_id = #{articleId,jdbcType=VARCHAR}
+        and operate_type = #{opeType,jdbcType=VARCHAR}
     </delete>
 
     <select id="showArticleLikedCount" resultMap="BaseResultMap">
@@ -110,6 +111,62 @@
         <include refid="Base_Column_List" />
         from t_bas_article_info ORDER BY create_time desc limit 10
     </select>
+
+    <select id="queryArticleRelationCount" parameterType="com.jason.article.dto.ArticleLikeDto" resultType="int">
+        select count(*)
+        from t_bas_article_relation
+        where
+        account = #{account}
+        and article_id = #{articleId}
+        and operate_type = #{opeType}
+    </select>
+
+    <select id="queryArticleLikeAndCollectCount" parameterType="string" resultType="com.jason.article.domain.ArticleLIkeEntity">
+        SELECT
+        (
+            SELECT
+                count(*)
+            FROM
+                t_bas_article_relation
+            WHERE
+                article_id = #{articleId}
+            AND operate_type = 1
+        ) as 'likedCount',
+        (
+            SELECT
+                count(*)
+            FROM
+                t_bas_article_relation
+            WHERE
+                article_id = #{articleId}
+            AND operate_type = 2
+        ) as 'collectCount'
+    </select>
+
+    <select id="queryArticleLikeAndCollectInfo" parameterType="map" resultType="com.jason.article.domain.ArticleLIkeEntity">
+        SELECT
+            (
+                SELECT
+                    count(*)
+                FROM
+                    t_bas_article_relation
+                WHERE
+                    article_id = #{articleId}
+                AND account = #{account}
+                AND operate_type = 1
+            ) AS 'isLiked',
+            (
+                SELECT
+                    count(*)
+                FROM
+                    t_bas_article_relation
+                WHERE
+                    article_id = #{articleId}
+                AND account = #{account}
+                AND operate_type = 2
+            ) AS 'isCollect'
+    </select>
+
 
 
 </mapper>

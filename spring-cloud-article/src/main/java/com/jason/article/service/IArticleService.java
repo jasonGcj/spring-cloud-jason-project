@@ -24,7 +24,7 @@ public interface IArticleService {
      * @param id
      * @return
      */
-    ResultVo queryArticleById(String id);
+    ResultVo queryArticleById(String id,String account);
 
     /**
      * 添加文章
